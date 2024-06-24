@@ -7,9 +7,9 @@ using StardewValley;
 using StardewValley.Characters;
 using StardewValley.Menus;
 
-namespace ValleyReminders.ui
+namespace SMUI.Elements
 {
-    internal class Table : Container
+    public class Table : Container
     {
         /*********
         ** Fields

@@ -1,6 +1,6 @@
- namespace ValleyReminders.ui
+ namespace SMUI.Elements
 {
-    internal class Intbox : Textbox
+    public class Intbox : Textbox
     {
         /*********
         ** Accessors

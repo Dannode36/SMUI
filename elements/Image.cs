@@ -2,9 +2,9 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace ValleyReminders.ui
+namespace SMUI.Elements
 {
-    internal class Image : Element, ISingleTexture
+    public class Image : Element, ISingleTexture
     {
         /*********
         ** Accessors

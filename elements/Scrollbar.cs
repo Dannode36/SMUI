@@ -6,9 +6,9 @@ using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 
-namespace ValleyReminders.ui
+namespace SMUI.Elements
 {
-    internal class Scrollbar : Element
+    public class Scrollbar : Element
     {
         /*********
         ** Fields

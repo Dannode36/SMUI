@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ValleyReminders.ui
+namespace SMUI
 {
-    internal class Utilities
+    public class Utilities
     {
         public static Texture2D DoPaletteSwap(Texture2D baseTex, Texture2D from, Texture2D to)
         {

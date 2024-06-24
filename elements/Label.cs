@@ -4,9 +4,9 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
 
-namespace ValleyReminders.ui
+namespace SMUI.Elements
 {
-    internal class Label : Element
+    public class Label : Element
     {
         /*********
         ** Accessors

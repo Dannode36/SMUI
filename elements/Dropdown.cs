@@ -7,9 +7,9 @@ using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 
-namespace ValleyReminders.ui
+namespace SMUI.Elements
 {
-    internal class Dropdown : Element, ISingleTexture
+    public class Dropdown : Element, ISingleTexture
     {
         /*********
         ** Accessors

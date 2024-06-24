@@ -1,8 +1,8 @@
 using StardewValley;
 
-namespace ValleyReminders.ui
+namespace SMUI.Elements
 {
-    internal class RootElement : Container
+    public class RootElement : Container
     {
         /*********
         ** Accessors

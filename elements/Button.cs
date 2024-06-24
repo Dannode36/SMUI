@@ -4,9 +4,9 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Menus;
 
-namespace ValleyReminders.ui
+namespace SMUI.Elements
 {
-    internal class Button : Element, ISingleTexture
+    public class Button : Element, ISingleTexture
     {
         /*********
         ** Fields

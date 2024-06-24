@@ -8,9 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ValleyReminders.ui
+namespace SMUI.Elements
 {
-    internal class ItemSlot : ItemWithBorder
+    public class ItemSlot : ItemWithBorder
     {
         public Item? Item { get; set; }
 

@@ -9,9 +9,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ValleyReminders.ui
+namespace SMUI.Elements
 {
-    internal class ItemWithBorder : Element
+    public class ItemWithBorder : Element
     {
         public static ItemWithBorder? HoveredElement { get; private set; }
 

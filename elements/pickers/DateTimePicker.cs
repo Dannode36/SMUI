@@ -8,9 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ValleyReminders.ui.pickers
+namespace SMUI.Elements.Pickers
 {
-    class DateTimePicker : Container
+    public class DateTimePicker : Container
     {
         public override int Width => 500;
 

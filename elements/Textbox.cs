@@ -5,9 +5,9 @@ using Microsoft.Xna.Framework.Input;
 using StardewValley;
 using StardewValley.Menus;
 
-namespace ValleyReminders.ui
+namespace SMUI.Elements
 {
-    internal class Textbox : Element, IKeyboardSubscriber
+    public class Textbox : Element, IKeyboardSubscriber
     {
         /*********
         ** Fields

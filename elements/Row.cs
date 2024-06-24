@@ -6,9 +6,9 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ValleyReminders.ui
+namespace SMUI.Elements
 {
-    class Row : Container
+    public class Row : Container
     {
         public Row(Element[] elements)
         {

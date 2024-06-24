@@ -1,8 +1,8 @@
 using Microsoft.Xna.Framework.Graphics;
 
-namespace ValleyReminders.ui
+namespace SMUI.Elements
 {
-    internal interface ISingleTexture
+    public interface ISingleTexture
     {
         public Texture2D? Texture { get; set; }
     }

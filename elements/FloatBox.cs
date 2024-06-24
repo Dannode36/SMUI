@@ -1,8 +1,8 @@
 using System.Linq;
 
-namespace ValleyReminders.ui
+namespace SMUI.Elements
 {
-    internal class Floatbox : Textbox
+    public class Floatbox : Textbox
     {
         /*********
         ** Accessors

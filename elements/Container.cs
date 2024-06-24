@@ -6,9 +6,9 @@ using Microsoft.Xna.Framework.Input;
 using StardewValley;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace ValleyReminders.ui
+namespace SMUI.Elements
 {
-    internal abstract class Container : Element
+    public abstract class Container : Element
     {
         /*********
         ** Fields

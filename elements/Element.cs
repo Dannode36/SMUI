@@ -5,9 +5,9 @@ using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewValley;
 
-namespace ValleyReminders.ui
+namespace SMUI.Elements
 {
-    internal abstract class Element
+    public abstract class Element
     {
         /*********
         ** Accessors
