@@ -75,10 +75,7 @@ namespace SMUI.Elements
 
         public void AddRow(Element[] elements)
         {
-            Row row = new(elements)
-            {
-                RowHeight = RowHeightImpl
-            };
+            Row row = new(elements);
             Rows.Add(row);
             AddChild(row);
 

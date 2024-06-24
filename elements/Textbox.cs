@@ -16,7 +16,6 @@ namespace SMUI.Elements
         private readonly SpriteFont Font;
         private bool SelectedImpl;
 
-
         /*********
         ** Accessors
         *********/
@@ -24,14 +23,14 @@ namespace SMUI.Elements
 
         public bool Selected
         {
-            get => this.SelectedImpl;
+            get => SelectedImpl;
             set
             {
-                if (this.SelectedImpl == value)
+                if (SelectedImpl == value)
                     return;
 
-                this.SelectedImpl = value;
-                if (this.SelectedImpl)
+                SelectedImpl = value;
+                if (SelectedImpl)
                     Game1.keyboardDispatcher.Subscriber = this;
                 else
                 {
@@ -41,14 +40,13 @@ namespace SMUI.Elements
             }
         }
 
-        public Action<Element> Callback { get; set; }
+        public Action<Element>? Callback { get; set; }
 
         /// <inheritdoc />
         public override int Width => 192;
 
         /// <inheritdoc />
         public override int Height => 48;
-
 
         /*********
         ** Public methods
@@ -146,8 +144,8 @@ namespace SMUI.Elements
         *********/
         protected virtual void ReceiveInput(string str)
         {
-            this.String += str;
-            this.Callback?.Invoke(this);
+            String += str;
+            Callback?.Invoke(this);
         }
     }
 }

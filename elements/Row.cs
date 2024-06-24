@@ -25,7 +25,7 @@ namespace SMUI.Elements
 
         public override int Width => Parent == null ? 0 : Parent.Width;
 
-        public override int Height => RowHeight;
+        public override int Height => Parent == null ? 0 : (Parent as Table)?.RowHeight ?? 0; //Clear as mud?
 
         public int MaxChildHeight
         {
@@ -39,6 +39,5 @@ namespace SMUI.Elements
                 return maxHeight;
             }
         }
-        public int RowHeight;
     }
 }

@@ -9,18 +9,23 @@
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
       <HintPath>D:\SteamLibrary\steamapps\common\Stardew Valley\MonoGame.Framework.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Stardew Valley">
       <HintPath>D:\SteamLibrary\steamapps\common\Stardew Valley\Stardew Valley.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="StardewModdingAPI">
       <HintPath>D:\SteamLibrary\steamapps\common\Stardew Valley\StardewModdingAPI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="StardewValley.GameData">
       <HintPath>D:\SteamLibrary\steamapps\common\Stardew Valley\StardewValley.GameData.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="xTile">
       <HintPath>D:\SteamLibrary\steamapps\common\Stardew Valley\xTile.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
 
