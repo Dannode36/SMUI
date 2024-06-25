@@ -398,4 +398,5 @@ FodyWeavers.xsd
 *.sln.iml
 
 # User
-/assemblies/
+assemblies/*.dll
+nuget-publish.bat
