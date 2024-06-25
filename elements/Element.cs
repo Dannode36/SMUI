@@ -75,18 +75,15 @@ namespace SMUI.Elements
                 Game1.playSound(HoveredSound);
             Hover = newHover;
 
-            if(Clickable)
+            if(Clickable && Parent != null && !Parent.ClickConsumed)
             {
                 ClickGestured = Game1.input.GetMouseState().LeftButton == ButtonState.Pressed && Game1.oldMouseState.LeftButton == ButtonState.Released;
                 ClickGestured = ClickGestured || (Game1.options.gamepadControls && (Game1.input.GetGamePadState().IsButtonDown(Buttons.A) && !Game1.oldPadState.IsButtonDown(Buttons.A)));
                 
                 if (Clicked)
                 {
-                    if (Parent != null)
-                    {
-                        ClickGestured = !Parent.ClickConsumed; //If a click was already consumed, we have not actually been clicked
-                        Parent.ClickConsumed = Parent.ClickConsumed || ClickGestured; //If the click has just been consumed, update the parent, otherwise it reassigns the same value
-                    }
+                    Parent.ClickConsumed = true;
+                    Parent.ClickConsumer = this;
 
                     if ((Dropdown.SinceDropdownWasActive > 0 || Dropdown.ActiveDropdown != null))
                     {
@@ -96,6 +93,10 @@ namespace SMUI.Elements
 
                 if (Clicked && ClickedSound != string.Empty)
                     Game1.playSound(ClickedSound);
+            }
+            else //Cover any edge cases
+            {
+                ClickGestured = false;
             }
         }
 
