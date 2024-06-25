@@ -91,11 +91,6 @@ namespace SMUI.Elements
                 Parent.ClickConsumed = ClickConsumed;
                 Parent.ClickConsumer = ClickConsumer;
             }
-
-            if(Parent == GetRoot() && ClickConsumer != null) //Only root element will log to avoid spam
-            {
-                Console.WriteLine($"Click consumed by: {ClickConsumer.GetType().Name}");
-            }
         }
 
         /// <inheritdoc />
