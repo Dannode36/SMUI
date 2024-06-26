@@ -50,6 +50,7 @@ namespace SMUI.Elements
         public bool Selected { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public bool ClickConsumed = false;
+        public Element? ClickConsumer = null;
 
         /*********
         ** Public methods
@@ -73,6 +74,8 @@ namespace SMUI.Elements
         public override void Update(bool isOffScreen = false)
         {
             ClickConsumed = false;
+            ClickConsumer = null;
+
             base.Update(isOffScreen);
             if (UpdateChildren)
             {
@@ -81,6 +84,12 @@ namespace SMUI.Elements
                     ChildrenImpl[i].Update(isOffScreen);
 
                 }
+            }
+
+            if(Parent != null) //Update parent container if a nested container
+            {
+                Parent.ClickConsumed = ClickConsumed;
+                Parent.ClickConsumer = ClickConsumer;
             }
         }
 

@@ -65,7 +65,7 @@ namespace SMUI.Elements
         public Table(bool fixedRowHeight = true)
         {
             FixedRowHeight = fixedRowHeight;
-            UpdateChildren = false; // table will update children itself
+            UpdateChildren = false; //Table will update children itself
             Scrollbar = new Scrollbar
             {
                 LocalPosition = new Vector2(0, 0)

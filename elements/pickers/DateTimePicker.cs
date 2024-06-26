@@ -22,14 +22,16 @@ namespace SMUI.Elements.Pickers
         public bool Open { get; private set; }
 
         //Closed UI
-        private Button button;
+        private readonly Button button;
 
         //Open UI
-        private Button closeButton;
-        StaticContainer background;
+        private readonly Button closeButton;
+        private readonly StaticContainer background;
 
         public DateTimePicker()
         {
+            Clickable = false;
+
             button = new(Game1.mouseCursors, new(384, 396, 15, 15), new(100, 50))
             {
                 Callback = (e) => { Open = true; },
@@ -53,8 +55,10 @@ namespace SMUI.Elements.Pickers
 
         public override void Update(bool isOffScreen = false)
         {
+            Clickable = false;
             base.Update(isOffScreen);
             button.Update(isOffScreen);
+
             if (Open)
             {
                 background.Update(isOffScreen);

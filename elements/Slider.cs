@@ -37,7 +37,7 @@ namespace SMUI.Elements
         public override void Draw(SpriteBatch b) { }
     }
 
-    internal class Slider<T> : Slider where T : struct
+    public class Slider<T> : Slider where T : struct
     {
         /*********
         ** Accessors
