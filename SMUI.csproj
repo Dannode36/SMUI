@@ -19,18 +19,23 @@
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
       <HintPath>assemblies\MonoGame.Framework.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Stardew Valley">
       <HintPath>assemblies\Stardew Valley.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="StardewModdingAPI">
       <HintPath>assemblies\StardewModdingAPI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="StardewValley.GameData">
       <HintPath>assemblies\StardewValley.GameData.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="xTile">
       <HintPath>assemblies\xTile.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
 </Project>
