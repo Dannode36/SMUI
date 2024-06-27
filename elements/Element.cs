@@ -41,6 +41,8 @@ namespace SMUI.Elements
         /// <summary>Whether to disable the element so it's invisible and can't be interacted with.</summary>
         public Func<bool>? ForceHide;
 
+        public bool Enabled { get; set; } = true;
+
         /*********
         ** Public methods
         *********/
@@ -50,7 +52,7 @@ namespace SMUI.Elements
         {
             bool hidden = IsHidden(isOffScreen);
 
-            if (hidden)
+            if (hidden || !Enabled)
             {
                 Hover = false;
                 ClickGestured = false;
@@ -118,7 +120,7 @@ namespace SMUI.Elements
         /// <param name="isOffScreen">Whether the element is currently off-screen.</param>
         public bool IsHidden(bool isOffScreen = false)
         {
-            return isOffScreen || ForceHide?.Invoke() == true;
+            return isOffScreen || ForceHide?.Invoke() == true || !Enabled;
         }
     }
 }

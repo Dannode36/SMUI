@@ -5,6 +5,7 @@ using StardewValley;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,8 +13,9 @@ namespace SMUI.Elements.Pickers
 {
     public class DateTimePicker : Container
     {
-        public override int Width => 500;
+        
 
+        public override int Width => 500;
         public override int Height => 300;
 
         public SDate SDate { get; private set; } = SDate.Now();
@@ -21,8 +23,13 @@ namespace SMUI.Elements.Pickers
 
         public bool Open { get; private set; }
 
+        private const int ButtonWidth = 600;
+        private const int ButtonHeight = 100;
+        private Vector2 editorOffset => new(50, 100);
+
         //Closed UI
         private readonly Button button;
+        private readonly Label label;
 
         //Open UI
         private readonly Button closeButton;
@@ -32,16 +39,37 @@ namespace SMUI.Elements.Pickers
         {
             Clickable = false;
 
-            button = new(Game1.mouseCursors, new(384, 396, 15, 15), new(100, 50))
+            button = new(Game1.mouseCursors, new(384, 396, 15, 15), new(ButtonWidth, ButtonHeight))
             {
-                Callback = (e) => { Open = true; },
+                Callback = (e) =>
+                { 
+                    Open = true;
+                    background!.Enabled = true;
+                    closeButton!.Enabled = true;
+                }
             };
             AddChild(button);
 
+            label = new()
+            {
+                //String = $"{SDate.ToLocaleString()} @ {Time}",
+                String = "Summer 28 in year 10 @ 2600",
+            };
+            label.LocalPosition = new(
+                (ButtonWidth - Label.MeasureString(label.String).X) / 2,
+                (ButtonHeight - Label.MeasureString(label.String).Y) / 2);
+
+            AddChild(label);
+
             closeButton = new(Game1.mouseCursors, new Rectangle(337, 494, 12, 12), new(48, 48))
             {
-                Callback = (e) => { Open = false; },
-                LocalPosition = new(500, 0)
+                Callback = (e) =>
+                {
+                    Open = false;
+                    background!.Enabled = false;
+                    closeButton!.Enabled = false;
+                },
+                LocalPosition = new Vector2(500, -12) + editorOffset
             };
             AddChild(closeButton);
 
@@ -49,31 +77,35 @@ namespace SMUI.Elements.Pickers
             {
                 Size = new(Width, Height),
                 OutlineColor = Color.Wheat,
+                LocalPosition = editorOffset
             };
             AddChild(background);
         }
 
         public override void Update(bool isOffScreen = false)
         {
-            Clickable = false;
             base.Update(isOffScreen);
-            button.Update(isOffScreen);
-
-            if (Open)
-            {
-                background.Update(isOffScreen);
-                closeButton.Update(isOffScreen);
-            }
         }
 
         public override void Draw(SpriteBatch b)
         {
             button.Draw(b);
+            label.Draw(b);
 
             if (Open)
             {
-                background.Draw(b);
-                closeButton.Draw(b);
+                const int padding = 64;
+                Rectangle contentArea = new(
+                    (int)background.Position.X - padding,
+                    (int)background.Position.Y - padding,
+                    (int)background.Width + 2 * padding,
+                    (int)background.Height + 2 * padding);
+
+                Utilities.InScissorRectangle(b, contentArea, contentBatch =>
+                {
+                    background.Draw(contentBatch);
+                    closeButton.Draw(contentBatch);
+                });
             }
         }
     }

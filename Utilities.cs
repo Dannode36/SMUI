@@ -11,6 +11,35 @@ namespace SMUI
 {
     public class Utilities
     {
+        public static void InScissorRectangle(SpriteBatch spriteBatch, Rectangle area, Action<SpriteBatch> draw)
+        {
+            // render the current sprite batch to the screen
+            spriteBatch.End();
+
+            // start temporary sprite batch
+            using SpriteBatch contentBatch = new(Game1.graphics.GraphicsDevice);
+            GraphicsDevice device = Game1.graphics.GraphicsDevice;
+            Rectangle prevScissorRectangle = device.ScissorRectangle;
+
+            // render in scissor rectangle
+            try
+            {
+                device.ScissorRectangle = area;
+                contentBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, Utility.ScissorEnabled);
+
+                draw(contentBatch);
+
+                contentBatch.End();
+            }
+            finally
+            {
+                device.ScissorRectangle = prevScissorRectangle;
+            }
+
+            // resume previous sprite batch
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null);
+        }
+
         public static Texture2D DoPaletteSwap(Texture2D baseTex, Texture2D from, Texture2D to)
         {
             var fromCols = new Color[from.Height];

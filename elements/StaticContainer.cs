@@ -10,9 +10,9 @@ namespace SMUI.Elements
 
         public Color? OutlineColor { get; set; } = null;
 
-        public override int Width => (int)this.Size.X;
+        public override int Width => (int)Size.X;
 
-        public override int Height => (int)this.Size.Y;
+        public override int Height => (int)Size.Y;
 
         public override void Draw(SpriteBatch b)
         {
