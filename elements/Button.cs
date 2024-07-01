@@ -77,7 +77,7 @@ namespace SMUI.Elements
             if (IsHidden())
                 return;
 
-            IClickableMenu.drawTextureBox(b, Game1.mouseCursors, TextureRect, (int)Position.X, (int)Position.Y, Width, Height, Hover ? HoverTint : IdleTint, Scale * ScaleFactor, drawShadow: false);
+            IClickableMenu.drawTextureBox(b, Game1.mouseCursors, TextureRect, (int)Position.X, (int)Position.Y, Width, Height, Hover ? HoverTint : IdleTint, 4f, drawShadow: false);
 
             //Game1.activeClickableMenu?.drawMouse(b);
         }
