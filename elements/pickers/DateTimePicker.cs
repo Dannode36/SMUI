@@ -2,12 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI.Utilities;
 using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SMUI.Elements.Pickers
 {
@@ -36,8 +30,8 @@ namespace SMUI.Elements.Pickers
         private bool dateLabelDirty = false;
 
         //Open UI
-        private readonly Button closeButton;
         private readonly StaticContainer background;
+        private readonly Button closeButton;
 
         private const int DayPerRow = 7;
         private static Vector2 DaySelectorPosition => new(50, 100);
@@ -70,18 +64,6 @@ namespace SMUI.Elements.Pickers
 
             AddChild(label);
 
-            closeButton = new(Game1.mouseCursors, new Rectangle(337, 494, 12, 12), new(48, 48))
-            {
-                Callback = (e) =>
-                {
-                    Open = false;
-                    background!.Enabled = false;
-                    closeButton!.Enabled = false;
-                },
-                LocalPosition = new Vector2(Width, -12) + EditorOffset
-            };
-            AddChild(closeButton);
-
             background = new()
             {
                 Size = new(Width, Height),
@@ -89,6 +71,17 @@ namespace SMUI.Elements.Pickers
                 LocalPosition = EditorOffset
             };
             AddChild(background);
+
+            closeButton = new(Game1.mouseCursors, new Rectangle(337, 494, 12, 12), new(48, 48))
+            {
+                Callback = (e) =>
+                {
+                    Open = false;
+                    background!.Enabled = false;
+                },
+                LocalPosition = new Vector2(Width, -12) + EditorOffset
+            };
+            background.AddChild(closeButton);
 
             //Init date buttons
             daySelectors = new();
@@ -125,8 +118,21 @@ namespace SMUI.Elements.Pickers
                     Font = Game1.smallFont
                 });
 
-                AddChild(daySelectors[i]);
-                AddChild(daySelectorLabels[i]);
+                background.AddChild(daySelectors[i]);
+                background.AddChild(daySelectorLabels[i]);
+            }
+
+            //Day names for the selector columns
+            for (int i = 0; i < 7; i++)
+            {
+                Label name = new()
+                {
+                    Font = Game1.smallFont,
+                    String = Utilities.NameOfDay(i)
+                };
+
+                name.LocalPosition = new(DaySelectorPosition.X + (i * name.Width), DaySelectorPosition.Y);
+                background.AddChild(name);
             }
         }
 

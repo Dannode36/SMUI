@@ -1,16 +1,26 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SMUI
 {
     public class Utilities
     {
+        public static string NameOfDay(int day, bool full = false)
+        {
+            return ((day % 7) + 1) switch
+            {
+                1 => full ? "Monday" : "Mon",
+                2 => full ? "Tuesday" : "Tue",
+                3 => full ? "Wednesday" : "Wed",
+                4 => full ? "Thursday" : "Thu",
+                5 => full ? "Friday" : "Fri",
+                6 => full ? "Saturday" : "Sat",
+                7 => full ? "Sunday" : "Sun",
+                _ => "",
+            };
+        }
+
         public static void InScissorRectangle(SpriteBatch spriteBatch, Rectangle area, Action<SpriteBatch> draw)
         {
             // render the current sprite batch to the screen

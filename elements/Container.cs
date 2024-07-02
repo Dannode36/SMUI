@@ -73,11 +73,12 @@ namespace SMUI.Elements
         /// <inheritdoc />
         public override void Update(bool isOffScreen = false)
         {
+            base.Update(isOffScreen);
+
             ClickConsumed = false;
             ClickConsumer = null;
 
-            base.Update(isOffScreen);
-            if (UpdateChildren)
+            if (Enabled && UpdateChildren)
             {
                 for (int i = ChildrenImpl.Count - (1); i >= 0; i--)
                 {
@@ -85,7 +86,7 @@ namespace SMUI.Elements
 
                 }
             }
-
+            
             if(Parent != null) //Update parent container if a nested container
             {
                 Parent.ClickConsumed = ClickConsumed;

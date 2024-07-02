@@ -50,7 +50,7 @@ namespace SMUI.Elements
         /// <summary>Measure the label's rendered dialogue text size.</summary>
         public Vector2 Measure()
         {
-            return Label.MeasureString(this.String, this.Bold, scale: this.Bold ? 1f : this.NonBoldScale, font: this.Font);
+            return MeasureString(this.String, this.Bold, scale: this.Bold ? 1f : this.NonBoldScale, font: this.Font);
         }
 
         /// <inheritdoc />

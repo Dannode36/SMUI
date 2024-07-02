@@ -8,13 +8,6 @@ namespace SMUI.Elements
 {
     public class Button : Element, ISingleTexture
     {
-        /*********
-        ** Fields
-        *********/
-
-        /*********
-        ** Accessors
-        *********/
         public Texture2D? Texture { get; set; }
         public Rectangle TextureRect { get; set; } = Rectangle.Empty;
 
@@ -78,8 +71,6 @@ namespace SMUI.Elements
                 return;
 
             IClickableMenu.drawTextureBox(b, Game1.mouseCursors, TextureRect, (int)Position.X, (int)Position.Y, Width, Height, Hover ? HoverTint : IdleTint, 4f, drawShadow: false);
-
-            //Game1.activeClickableMenu?.drawMouse(b);
         }
     }
 }
