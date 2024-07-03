@@ -8,16 +8,16 @@ namespace SMUI
     {
         public static string NameOfDay(int day, bool full = false)
         {
-            return ((day % 7) + 1) switch
+            return ((day - 1) % 7) switch
             {
-                1 => full ? "Monday" : "Mon",
-                2 => full ? "Tuesday" : "Tue",
-                3 => full ? "Wednesday" : "Wed",
-                4 => full ? "Thursday" : "Thu",
-                5 => full ? "Friday" : "Fri",
-                6 => full ? "Saturday" : "Sat",
-                7 => full ? "Sunday" : "Sun",
-                _ => "",
+                0 => full ? "Monday" : "Mon",
+                1 => full ? "Tuesday" : "Tue",
+                2 => full ? "Wednesday" : "Wed",
+                3 => full ? "Thursday" : "Thu",
+                4 => full ? "Friday" : "Fri",
+                5 => full ? "Saturday" : "Sat",
+                6 => full ? "Sunday" : "Sun",
+                _ => "###",
             };
         }
 

@@ -86,8 +86,8 @@ namespace SMUI.Elements
 
                 }
             }
-            
-            if(Parent != null) //Update parent container if a nested container
+
+            if (Parent != null) //Update parent container if a nested container
             {
                 Parent.ClickConsumed = ClickConsumed;
                 Parent.ClickConsumer = ClickConsumer;

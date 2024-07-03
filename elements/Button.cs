@@ -8,6 +8,9 @@ namespace SMUI.Elements
 {
     public class Button : Element, ISingleTexture
     {
+        public static Color IdleTintColour => Color.White;
+        public static Color HoverTintColour => Color.Wheat;
+
         public Texture2D? Texture { get; set; }
         public Rectangle TextureRect { get; set; } = Rectangle.Empty;
 

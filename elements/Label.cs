@@ -43,35 +43,37 @@ namespace SMUI.Elements
         {
             base.Update(isOffScreen);
 
-            if (this.Clicked)
-                this.Callback?.Invoke(this);
+            if (Clicked)
+                Callback?.Invoke(this);
         }
 
         /// <summary>Measure the label's rendered dialogue text size.</summary>
         public Vector2 Measure()
         {
-            return MeasureString(this.String, this.Bold, scale: this.Bold ? 1f : this.NonBoldScale, font: this.Font);
+            return MeasureString(String, Bold, scale: Bold ? 1f : NonBoldScale, font: Font);
         }
 
         /// <inheritdoc />
         public override void Draw(SpriteBatch b)
         {
-            if (this.IsHidden())
+            if (IsHidden())
                 return;
 
-            bool altColor = this.Hover && this.Callback != null;
-            if (this.Bold)
-                SpriteText.drawString(b, this.String, (int)this.Position.X, (int)this.Position.Y, layerDepth: 1, color: altColor ? SpriteText.color_Gray : null);
+            bool altColor = Hover && Callback != null;
+            if (Bold)
+            {
+                SpriteText.drawString(b, String, (int)Position.X, (int)Position.Y, layerDepth: 1, color: altColor ? SpriteText.color_Gray : null);
+            }
             else
             {
-                Color col = altColor ? this.HoverTextColor : this.IdleTextColor;
+                Color col = altColor ? HoverTextColor : IdleTextColor;
                 if (col.A <= 0)
                     return;
 
-                if (this.NonBoldShadow)
-                    Utility.drawTextWithShadow(b, this.String, this.Font, this.Position, col, this.NonBoldScale);
+                if (NonBoldShadow)
+                    Utility.drawTextWithShadow(b, String, Font, Position, col, NonBoldScale);
                 else
-                    b.DrawString(this.Font, this.String, this.Position, col, 0f, Vector2.Zero, this.NonBoldScale, SpriteEffects.None, 1);
+                    b.DrawString(Font, String, Position, col, 0f, Vector2.Zero, NonBoldScale, SpriteEffects.None, 1);
             }
         }
 

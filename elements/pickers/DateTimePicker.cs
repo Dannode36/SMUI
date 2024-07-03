@@ -35,7 +35,8 @@ namespace SMUI.Elements.Pickers
 
         private const int DayPerRow = 7;
         private static Vector2 DaySelectorPosition => new(50, 100);
-        private const int DayButtonWidth = 50;
+        private const int DayButtonWidth = 52;
+        private const int DayButtonOffset = 4;
         private readonly List<Button> daySelectors;
         private readonly List<Label> daySelectorLabels;
 
@@ -47,9 +48,8 @@ namespace SMUI.Elements.Pickers
             {
                 Callback = (e) =>
                 { 
-                    Open = true;
-                    background!.Enabled = true;
-                    closeButton!.Enabled = true;
+                    Open = !Open;
+                    background!.Enabled = Open;
                 }
             };
             AddChild(button);
@@ -91,32 +91,29 @@ namespace SMUI.Elements.Pickers
                 int day = i + 1;
                 int row = i / DayPerRow;
                 int col = i % DayPerRow;
-                const int offset = 4;
 
-                Vector2 buttonPos = new(DaySelectorPosition.X + ((DayButtonWidth + offset) * col), DaySelectorPosition.Y + ((DayButtonWidth + offset) * row));
+                Vector2 buttonPos = new(DaySelectorPosition.X + ((DayButtonWidth + DayButtonOffset) * col), DaySelectorPosition.Y + ((DayButtonWidth + DayButtonOffset) * row));
 
                 daySelectors.Add(new(Game1.mouseCursors, new(432, 439, 9, 9), new(DayButtonWidth, DayButtonWidth))
                 {
                     LocalPosition = buttonPos,
                     Callback = (e) =>
                     {
-                        Day = day;
-                        dateLabelDirty = true;
+                        SetDay(day);
                         Callback?.Invoke(this); //DateTimePicker callback
                     }
                 });
 
-                string labelString = (i + 1).ToString();
-                Vector2 labelPos = new(
-                    buttonPos.X + ((DayButtonWidth - Label.MeasureString(labelString, font: Game1.smallFont).X) / 2), 
-                    buttonPos.Y + ((DayButtonWidth - Label.MeasureString(labelString, font: Game1.smallFont).Y) / 2));
-
-                daySelectorLabels.Add(new()
+                Label label = new()
                 {
-                    LocalPosition = labelPos,
-                    String = labelString,
-                    Font = Game1.smallFont
-                });
+                    String = (i + 1).ToString(),
+                    Font = Game1.smallFont,
+                    NonBoldShadow = false
+                };
+                label.LocalPosition = new(
+                    buttonPos.X + ((DayButtonWidth - label.Width) / 2),
+                    buttonPos.Y + ((DayButtonWidth - label.Height) / 2));
+                daySelectorLabels.Add(label);
 
                 background.AddChild(daySelectors[i]);
                 background.AddChild(daySelectorLabels[i]);
@@ -128,12 +125,30 @@ namespace SMUI.Elements.Pickers
                 Label name = new()
                 {
                     Font = Game1.smallFont,
-                    String = Utilities.NameOfDay(i)
+                    String = Utilities.NameOfDay(i + 1),
                 };
+                name.LocalPosition = new(
+                        DaySelectorPosition.X + ((DayButtonWidth + DayButtonOffset) * i) + (DayButtonWidth - name.Width) / 2,
+                        DaySelectorPosition.Y - 32);
 
-                name.LocalPosition = new(DaySelectorPosition.X + (i * name.Width), DaySelectorPosition.Y);
                 background.AddChild(name);
             }
+
+            SetDay(Day);
+        }
+
+        public void SetDay(int day)
+        {
+            daySelectors[Day - 1].IdleTint = Button.IdleTintColour; //Unset the previous day button
+            daySelectors[Day - 1].HoverTint = Button.HoverTintColour; //Unset the previous day button
+            daySelectorLabels[Day - 1].IdleTextColor = Game1.textColor;
+
+            Day = day;
+            dateLabelDirty = true;
+
+            daySelectors[Day - 1].IdleTint = Color.LightSeaGreen; //Set the current day button
+            daySelectors[Day - 1].HoverTint = Color.SeaGreen; //Set the current day button
+            daySelectorLabels[Day - 1].IdleTextColor = Color.White;
         }
 
         public override void Update(bool isOffScreen = false)
@@ -144,8 +159,8 @@ namespace SMUI.Elements.Pickers
             {
                 label.String = $"{Date.ToLocaleString()} @ {Time}";
                 label.LocalPosition = new(
-                    (ButtonWidth - Label.MeasureString(label.String).X) / 2,
-                    (ButtonHeight - Label.MeasureString(label.String).Y) / 2);
+                    (ButtonWidth - label.Width) / 2,
+                    (ButtonHeight - label.Height) / 2);
                 dateLabelDirty = false;
             }
         }
@@ -161,24 +176,12 @@ namespace SMUI.Elements.Pickers
                 Rectangle contentArea = new(
                     (int)background.Position.X - padding,
                     (int)background.Position.Y - padding,
-                    (int)background.Width + 2 * padding,
-                    (int)background.Height + 2 * padding);
+                    background.Width + 2 * padding,
+                    background.Height + 2 * padding);
 
                 Utilities.InScissorRectangle(b, contentArea, contentBatch =>
                 {
                     background.Draw(contentBatch);
-
-                    foreach (var daySelector in daySelectors)
-                    {
-                        daySelector.Draw(contentBatch);
-                    }
-
-                    foreach (var daySelectorLabel in daySelectorLabels)
-                    {
-                        daySelectorLabel.Draw(contentBatch);
-                    }
-
-                    closeButton.Draw(contentBatch);
                 });
             }
         }
