@@ -89,7 +89,7 @@ namespace SMUI.Elements
                     Parent.ClickConsumed = true;
                     Parent.ClickConsumer = this;
 
-                    if ((Dropdown.SinceDropdownWasActive > 0 || Dropdown.ActiveDropdown != null))
+                    if (Dropdown.SinceDropdownWasActive > 0 || Dropdown.ActiveDropdown != null)
                     {
                         ClickGestured = false;
                     }

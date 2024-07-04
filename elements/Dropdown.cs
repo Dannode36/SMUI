@@ -25,9 +25,9 @@ namespace SMUI.Elements
 
         public string Label => Labels[ActiveChoice];
 
-        public int ActiveChoice { get; set; }
+        public int ActiveChoice { get; set; } = 0;
 
-        public int ActivePosition { get; set; }
+        public int ActivePosition { get; set; } = 0;
         public string[] Choices { get; set; } = new[] { "null" };
 
         public string[] Labels { get; set; } = new[] { "null" };
