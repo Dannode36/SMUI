@@ -103,16 +103,17 @@ namespace SMUI.Elements.Pickers
 
                 //Label
                 string labelString = (i + 1).ToString();
-                Vector2 labelPos = new(
-                    buttonPos.X + ((DayButtonWidth - Label.MeasureString(labelString).X) / 2),
-                    buttonPos.Y + ((DayButtonWidth - Label.MeasureString(labelString).Y) / 2));
+                
                 daySelectorLabels.Add(new()
                 {
                     String = labelString,
                     Font = Game1.smallFont,
                     NonBoldShadow = false,
-                    LocalPosition = labelPos
                 });
+                Vector2 labelPos = new(
+                    buttonPos.X + ((DayButtonWidth - daySelectorLabels[i].Width) / 2),
+                    buttonPos.Y + ((DayButtonWidth - daySelectorLabels[i].Height) / 2));
+                daySelectorLabels[i].LocalPosition = labelPos;
                 popUpBackground.AddChild(daySelectorLabels[i]);
             }
 

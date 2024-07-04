@@ -4,6 +4,7 @@ using System.Xml.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
+using StardewValley.BellsAndWhistles;
 using StardewValley.Characters;
 using StardewValley.Menus;
 
@@ -150,8 +151,9 @@ namespace SMUI.Elements
             Element? renderLast = null;
             Utilities.InScissorRectangle(b, contentArea, contentBatch =>
             {
-                foreach (var row in Rows)
+                for (int i = Rows.Count - (1); i >= 0; i--)
                 {
+                    var row = Rows[i];
                     if (IsElementOffScreen(row))
                     {
                         continue;
