@@ -20,7 +20,7 @@ namespace SMUI.Elements.Pickers
 
         private const int ButtonWidth = 600;
         private const int ButtonHeight = 100;
-        private static Vector2 EditorOffset => new(50, 100);
+        private static Vector2 EditorOffset => new(0, 108);
 
         public event Action<Element>? OnChange;
         public event Action<Element, bool>? OnToggle;
@@ -42,11 +42,18 @@ namespace SMUI.Elements.Pickers
         
         private readonly Dropdown seasonDropdown;
 
-        public DateTimePicker()
+        public DateTimePicker() : this(Vector2.Zero) { }
+
+        public DateTimePicker(Vector2 buttonSize)
         {
             Clickable = false;
 
-            popUpButton = new(Game1.mouseCursors, new(384, 396, 15, 15), new(ButtonWidth, ButtonHeight))
+            if(buttonSize == Vector2.Zero)
+            {
+                buttonSize = new(ButtonWidth, ButtonHeight);
+            }
+
+            popUpButton = new(Game1.mouseCursors, new(384, 396, 15, 15), buttonSize)
             {
                 Callback = (e) =>
                 { 
@@ -74,7 +81,7 @@ namespace SMUI.Elements.Pickers
                     Open = false;
                     popUpBackground!.Enabled = false;
                 },
-                LocalPosition = new Vector2(Width, -12) + EditorOffset
+                LocalPosition = new Vector2(Width, -20)
             };
             popUpBackground.AddChild(closeButton);
 
@@ -132,25 +139,26 @@ namespace SMUI.Elements.Pickers
                 popUpBackground.AddChild(name);
             }
 
+
+            var choices = new[]
+            {
+                StardewValley.Season.Spring.ToString(),
+                StardewValley.Season.Summer.ToString(),
+                StardewValley.Season.Fall.ToString(),
+                StardewValley.Season.Winter.ToString()
+            };
+
             //Season dropdown
             seasonDropdown = new()
             {
-                Choices = new[]
-                {
-                    StardewValley.Season.Spring.ToString(),
-                    StardewValley.Season.Summer.ToString(),
-                    StardewValley.Season.Fall.ToString(),
-                    StardewValley.Season.Winter.ToString()
-                },
-                Labels = new[]
-                {
-                    StardewValley.Season.Spring.ToString(),
-                    StardewValley.Season.Summer.ToString(),
-                    StardewValley.Season.Fall.ToString(),
-                    StardewValley.Season.Winter.ToString()
-                },
-                MaxValuesAtOnce = 4,
-                LocalPosition = new(500, 250)
+                Choices = choices,
+                Labels = choices,
+                MaxValuesAtOnce = choices.Length,
+                LocalPosition = new(500, 250),
+            };
+            seasonDropdown.OnChange += (e) =>
+            {
+                SetSeason(e.Value);
             };
             popUpBackground.AddChild(seasonDropdown);
 
@@ -170,6 +178,13 @@ namespace SMUI.Elements.Pickers
             daySelectors[Day - 1].IdleTint = Color.LightSeaGreen; //Highlight the current day button
             daySelectors[Day - 1].HoverTint = Color.SeaGreen;
             daySelectorLabels[Day - 1].IdleTextColor = Color.White; //Change label to white for better contrast
+        }
+
+        public void SetSeason(string season)
+        {
+            Season = season;
+            UpdateDateLabel();
+            OnChange?.Invoke(this);
         }
 
         public override string ToString()

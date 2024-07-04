@@ -34,7 +34,7 @@ namespace SMUI.Elements
 
         public bool Dropped;
 
-        public Action<Element>? Callback;
+        public event Action<Dropdown>? OnChange;
 
         public static Dropdown? ActiveDropdown;
         public static int SinceDropdownWasActive = 0;
@@ -100,7 +100,7 @@ namespace SMUI.Elements
                     int choice = (Game1.getOldMouseY() - drawY) / Height;
                     ActiveChoice = choice + ActivePosition;
 
-                    Callback?.Invoke(this);
+                    OnChange?.Invoke(this);
                 }
             }
 
