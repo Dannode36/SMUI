@@ -54,14 +54,7 @@ namespace SMUI.Elements.Pickers
             };
             AddChild(button);
 
-            label = new()
-            {
-                String = $"{Date.ToLocaleString()} @ {Time}",
-            };
-            label.LocalPosition = new(
-                (ButtonWidth - Label.MeasureString(label.String).X) / 2,
-                (ButtonHeight - Label.MeasureString(label.String).Y) / 2);
-
+            label = new();
             AddChild(label);
 
             background = new()
@@ -92,8 +85,10 @@ namespace SMUI.Elements.Pickers
                 int row = i / DayPerRow;
                 int col = i % DayPerRow;
 
-                Vector2 buttonPos = new(DaySelectorPosition.X + ((DayButtonWidth + DayButtonOffset) * col), DaySelectorPosition.Y + ((DayButtonWidth + DayButtonOffset) * row));
-
+                //Button
+                Vector2 buttonPos = new(
+                    DaySelectorPosition.X + ((DayButtonWidth + DayButtonOffset) * col), 
+                    DaySelectorPosition.Y + ((DayButtonWidth + DayButtonOffset) * row));
                 daySelectors.Add(new(Game1.mouseCursors, new(432, 439, 9, 9), new(DayButtonWidth, DayButtonWidth))
                 {
                     LocalPosition = buttonPos,
@@ -103,19 +98,20 @@ namespace SMUI.Elements.Pickers
                         Callback?.Invoke(this); //DateTimePicker callback
                     }
                 });
-
-                Label label = new()
-                {
-                    String = (i + 1).ToString(),
-                    Font = Game1.smallFont,
-                    NonBoldShadow = false
-                };
-                label.LocalPosition = new(
-                    buttonPos.X + ((DayButtonWidth - label.Width) / 2),
-                    buttonPos.Y + ((DayButtonWidth - label.Height) / 2));
-                daySelectorLabels.Add(label);
-
                 background.AddChild(daySelectors[i]);
+
+                //Label
+                string labelString = (i + 1).ToString();
+                Vector2 labelPos = new(
+                    buttonPos.X + ((DayButtonWidth - Label.MeasureString(labelString).X) / 2),
+                    buttonPos.Y + ((DayButtonWidth - Label.MeasureString(labelString).Y) / 2));
+                daySelectorLabels.Add(new()
+                {
+                    String = labelString,
+                    Font = Game1.smallFont,
+                    NonBoldShadow = false,
+                    LocalPosition = labelPos
+                });
                 background.AddChild(daySelectorLabels[i]);
             }
 
@@ -139,30 +135,29 @@ namespace SMUI.Elements.Pickers
 
         public void SetDay(int day)
         {
-            daySelectors[Day - 1].IdleTint = Button.IdleTintColour; //Unset the previous day button
-            daySelectors[Day - 1].HoverTint = Button.HoverTintColour; //Unset the previous day button
-            daySelectorLabels[Day - 1].IdleTextColor = Game1.textColor;
+            daySelectors[Day - 1].IdleTint = Button.IdleTintColour; //Reset the previous day button colour
+            daySelectors[Day - 1].HoverTint = Button.HoverTintColour;
+            daySelectorLabels[Day - 1].IdleTextColor = Game1.textColor; //Reset the previous day label colour
 
             Day = day;
-            dateLabelDirty = true;
+            UpdateDateLabel();
 
-            daySelectors[Day - 1].IdleTint = Color.LightSeaGreen; //Set the current day button
-            daySelectors[Day - 1].HoverTint = Color.SeaGreen; //Set the current day button
-            daySelectorLabels[Day - 1].IdleTextColor = Color.White;
+            daySelectors[Day - 1].IdleTint = Color.LightSeaGreen; //Highlight the current day button
+            daySelectors[Day - 1].HoverTint = Color.SeaGreen;
+            daySelectorLabels[Day - 1].IdleTextColor = Color.White; //Change label to white for better contrast
+        }
+
+        private void UpdateDateLabel()
+        {
+            label.String = $"{Date.ToLocaleString()} \\@ {Time}";
+            label.LocalPosition = new(
+                (ButtonWidth - label.Width) / 2,
+                (ButtonHeight - label.Height) / 2);
         }
 
         public override void Update(bool isOffScreen = false)
         {
             base.Update(isOffScreen);
-
-            if(dateLabelDirty)
-            {
-                label.String = $"{Date.ToLocaleString()} @ {Time}";
-                label.LocalPosition = new(
-                    (ButtonWidth - label.Width) / 2,
-                    (ButtonHeight - label.Height) / 2);
-                dateLabelDirty = false;
-            }
         }
 
         public override void Draw(SpriteBatch b)

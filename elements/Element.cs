@@ -38,7 +38,7 @@ namespace SMUI.Elements
         public bool Clicked => Hover && ClickGestured;
         public virtual string ClickedSound => string.Empty;
 
-        public abstract float DrawLayer { get; set; }
+        //public abstract float DrawLayer { get; set; }
 
         /// <summary>Whether to disable the element so it's invisible and can't be interacted with.</summary>
         public Func<bool>? ForceHide;

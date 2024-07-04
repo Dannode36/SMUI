@@ -1,4 +1,4 @@
- namespace SMUI.Elements
+namespace SMUI.Elements
 {
     public class Intbox : Textbox
     {
