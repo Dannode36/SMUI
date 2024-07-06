@@ -69,8 +69,8 @@ namespace SMUI.Elements
                 //if (Mouse.GetState().LeftButton == ButtonState.Released)
                 if (Constants.TargetPlatform != GamePlatform.Android)
                 {
-                    if ((Mouse.GetState().LeftButton == ButtonState.Pressed && Game1.oldMouseState.LeftButton == ButtonState.Released ||
-                         Game1.input.GetGamePadState().Buttons.A == ButtonState.Pressed && Game1.oldPadState.Buttons.A == ButtonState.Released)
+                    if ((Mouse.GetState().LeftButton == ButtonState.Released && Game1.oldMouseState.LeftButton == ButtonState.Pressed ||
+                         Game1.input.GetGamePadState().Buttons.A == ButtonState.Released && Game1.oldPadState.Buttons.A == ButtonState.Pressed)
                         && !justClicked)
                     {
                         Game1.playSound("drumkit6");
@@ -81,9 +81,9 @@ namespace SMUI.Elements
                 }
                 else
                 {
-                    if ((Game1.input.GetMouseState().LeftButton == ButtonState.Pressed && Game1.oldMouseState.LeftButton == ButtonState.Released ||
-                         Game1.input.GetGamePadState().Buttons.A == ButtonState.Pressed && Game1.oldPadState.Buttons.A == ButtonState.Released)
-                        && !justClicked)
+                    if ((Game1.input.GetMouseState().LeftButton == ButtonState.Released && Game1.oldMouseState.LeftButton == ButtonState.Pressed ||
+                         Game1.input.GetGamePadState().Buttons.A == ButtonState.Released && Game1.oldPadState.Buttons.A == ButtonState.Pressed)
+                         && !justClicked)
                     {
                         Game1.playSound("drumkit6");
                         Dropped = false;
@@ -107,7 +107,7 @@ namespace SMUI.Elements
             if (Dropped)
             {
                 ActiveDropdown = this;
-                SinceDropdownWasActive = 3;
+                SinceDropdownWasActive = 2; //Frame delay
             }
             else
             {
@@ -123,25 +123,6 @@ namespace SMUI.Elements
                 ActivePosition = Math.Min(Math.Max(ActivePosition - (direction / 120), 0), Choices.Length - MaxValuesAtOnce);
             else
                 ActiveDropdown = null;
-        }
-
-        public void DrawOld(SpriteBatch b)
-        {
-            IClickableMenu.drawTextureBox(b,    Texture, BackgroundTextureRect, (int)Position.X, (int)Position.Y, Width - 48, Height, Color.White, 4, false);
-            b.DrawString(Game1.smallFont, Value, new Vector2(Position.X + 4, Position.Y + 8), Game1.textColor);
-            b.Draw(Texture, new Vector2(Position.X + Width - 48, Position.Y), ButtonTextureRect, Color.White, 0, Vector2.Zero, 4, SpriteEffects.None, 0);
-
-            if (Dropped)
-            {
-                int tall = Choices.Length * Height;
-                IClickableMenu.drawTextureBox(b, Texture, BackgroundTextureRect, (int)Position.X, (int)Position.Y, Width - 48, tall, Color.White, 4, false);
-                for (int i = 0; i < Choices.Length; ++i)
-                {
-                    if (i == ActiveChoice)
-                        b.Draw(Game1.staminaRect, new Rectangle((int)Position.X + 4, (int)Position.Y + i * Height, Width - 48 - 8, Height), null, Color.Wheat, 0, Vector2.Zero, SpriteEffects.None, 0.98f);
-                    b.DrawString(Game1.smallFont, Choices[i], new Vector2(Position.X + 4, Position.Y + i * Height + 8), Game1.textColor, 0, Vector2.Zero, 1, SpriteEffects.None, 1);
-                }
-            }
         }
 
         public override void Draw(SpriteBatch b)

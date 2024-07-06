@@ -151,7 +151,7 @@ namespace SMUI.Elements
             Element? renderLast = null;
             Utilities.InScissorRectangle(b, contentArea, contentBatch =>
             {
-                for (int i = Rows.Count - (1); i >= 0; i--)
+                for (int i = Rows.Count - 1; i >= 0; i--)
                 {
                     var row = Rows[i];
                     if (IsElementOffScreen(row))
