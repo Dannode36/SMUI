@@ -10,16 +10,9 @@ namespace SMUI.Elements
 {
     public class Scrollbar : Element
     {
-        /*********
-        ** Fields
-        *********/
         private bool DragScroll;
 
-
-        /*********
-        ** Accessors
-        *********/
-        public int RequestHeight { get; set; }
+        public int UserHeight { get; set; }
 
         public int Rows { get; set; }
         public int FrameSize { get; set; }
@@ -29,16 +22,9 @@ namespace SMUI.Elements
 
         public float ScrollPercent => (MaxTopRow > 0) ? TopRow / (float)MaxTopRow : 0f;
 
-        /// <inheritdoc />
         public override int Width => 24;
+        public override int Height => UserHeight;
 
-        /// <inheritdoc />
-        public override int Height => RequestHeight;
-
-
-        /*********
-        ** Public methods
-        *********/
         public void ScrollBy(int amount)
         {
             int row = Utilities.Clamp(0, TopRow + amount, MaxTopRow);
@@ -58,22 +44,28 @@ namespace SMUI.Elements
             }
         }
 
-        /// <inheritdoc />
         public override void Update(bool isOffScreen = false)
         {
             base.Update(isOffScreen);
 
             if (Clicked)
+            {
                 DragScroll = true;
+            }
+
             if (Constants.TargetPlatform != GamePlatform.Android)
             {
                 if (DragScroll && Mouse.GetState().LeftButton == ButtonState.Released)
+                {
                     DragScroll = false;
+                }
             }
             else
             {
                 if (DragScroll && Game1.input.GetMouseState().LeftButton == ButtonState.Released)
+                {
                     DragScroll = false;
+                }
             }
 
 
@@ -85,15 +77,12 @@ namespace SMUI.Elements
             }
         }
 
-        /// <inheritdoc />
         public override void Draw(SpriteBatch b)
         {
-            if (IsHidden())
-                return;
+            if (IsHidden()) { return; }
 
             // Don't draw a scrollbar if scrolling is (currently) not possible.
-            if (MaxTopRow == 0)
-                return;
+            if (MaxTopRow == 0) { return; }
 
             Rectangle back = new((int)Position.X, (int)Position.Y, Width, Height);
             Vector2 front = new(back.X, back.Y + (Height - 40) * ScrollPercent);

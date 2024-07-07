@@ -187,7 +187,7 @@ namespace SMUI.Elements
         private void UpdateScrollbar()
         {
             Scrollbar.LocalPosition = new Vector2(Size.X + 48, Scrollbar.LocalPosition.Y);
-            Scrollbar.RequestHeight = (int)Size.Y;
+            Scrollbar.UserHeight = (int)Size.Y;
             Scrollbar.Rows = PxToRow(ContentHeight);
             Scrollbar.FrameSize = (int)(Size.Y / RowHeight);
         }
