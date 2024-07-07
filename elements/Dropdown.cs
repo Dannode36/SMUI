@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SMUI.elements;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
@@ -11,26 +12,28 @@ namespace SMUI.Elements
 {
     public class Dropdown : Element, ISingleTexture
     {
-        public int RequestWidth { get; set; }
-        public int MaxValuesAtOnce { get; set; }
+        public int UserWidth { get; set; }
+        public int MaxOptionsInDrop { get; set; } = 5;
         public Texture2D? Texture { get; set; } = Game1.mouseCursors;
         public Rectangle BackgroundTextureRect { get; set; } = OptionsDropDown.dropDownBGSource;
         public Rectangle ButtonTextureRect { get; set; } = OptionsDropDown.dropDownButtonSource;
 
+        public Option Option => Choices[ActiveChoice];
         public string Value
         {
-            get => Choices[ActiveChoice];
-            set { if (Choices.Contains(value)) ActiveChoice = Array.IndexOf(Choices, value); }
+            get => Choices[ActiveChoice].Value;
+            set 
+            {
+                int index = Choices.FindIndex(x => x.Value == value);
+                if (index != -1) ActiveChoice = index;
+            }
         }
-
-        public string Label => Labels[ActiveChoice];
+        public string Label => Choices[ActiveChoice].Label;
 
         public int ActiveChoice { get; set; } = 0;
 
         public int ActivePosition { get; set; } = 0;
-        public string[] Choices { get; set; } = new[] { "null" };
-
-        public string[] Labels { get; set; } = new[] { "null" };
+        public List<Option> Choices { get; set; } = new();
 
         public bool Dropped;
 
@@ -40,7 +43,7 @@ namespace SMUI.Elements
         public static int SinceDropdownWasActive = 0;
 
         /// <inheritdoc />
-        public override int Width => Math.Max(300, Math.Min(500, RequestWidth));
+        public override int Width => Math.Max(300, Math.Min(500, UserWidth));
 
         /// <inheritdoc />
         public override int Height => 44;
@@ -66,7 +69,6 @@ namespace SMUI.Elements
 
             if (Dropped)
             {
-                //if (Mouse.GetState().LeftButton == ButtonState.Released)
                 if (Constants.TargetPlatform != GamePlatform.Android)
                 {
                     if ((Mouse.GetState().LeftButton == ButtonState.Released && Game1.oldMouseState.LeftButton == ButtonState.Pressed ||
@@ -92,13 +94,13 @@ namespace SMUI.Elements
                     }
                 }
 
-                int tall = Math.Min(MaxValuesAtOnce, Choices.Length - ActivePosition) * Height;
+                int tall = Math.Min(MaxOptionsInDrop, Choices.Count - ActivePosition) * Height;
                 int drawY = Math.Min((int)Position.Y, Game1.uiViewport.Height - tall);
-                var bounds2 = new Rectangle((int)Position.X, drawY,Width, Height * MaxValuesAtOnce);
+                var bounds2 = new Rectangle((int)Position.X, drawY,Width, Height * MaxOptionsInDrop);
                 if (bounds2.Contains(Game1.getOldMouseX(), Game1.getOldMouseY()))
                 {
                     int choice = (Game1.getOldMouseY() - drawY) / Height;
-                    ActiveChoice = choice + ActivePosition;
+                    ActiveChoice = Math.Max(0, Math.Min(choice + ActivePosition, Choices.Count - 1));
 
                     OnChange?.Invoke(this);
                 }
@@ -113,14 +115,14 @@ namespace SMUI.Elements
             {
                 if (ActiveDropdown == this)
                     ActiveDropdown = null;
-                ActivePosition = Math.Min(ActiveChoice, Choices.Length - MaxValuesAtOnce);
+                ActivePosition = Math.Min(ActiveChoice, Math.Max(Choices.Count - MaxOptionsInDrop, 0));
             }
         }
 
         public void ReceiveScrollWheelAction(int direction)
         {
             if (Dropped)
-                ActivePosition = Math.Min(Math.Max(ActivePosition - (direction / 120), 0), Choices.Length - MaxValuesAtOnce);
+                ActivePosition = Math.Min(Math.Max(ActivePosition - (direction / 120), 0), Choices.Count - MaxOptionsInDrop);
             else
                 ActiveDropdown = null;
         }
@@ -136,17 +138,17 @@ namespace SMUI.Elements
 
             if (Dropped)
             {
-                int maxValues = MaxValuesAtOnce;
+                int maxValues = MaxOptionsInDrop;
                 int start = ActivePosition;
-                int end = Math.Min(Choices.Length, start + maxValues);
-                int tall = Math.Min(maxValues, Choices.Length - ActivePosition) * Height;
+                int end = Math.Min(Choices.Count, start + maxValues);
+                int tall = Math.Min(maxValues, Choices.Count - ActivePosition) * Height;
                 int drawY = Math.Min((int)Position.Y, Game1.uiViewport.Height - tall);
                 IClickableMenu.drawTextureBox(b, Texture, BackgroundTextureRect, (int)Position.X, drawY, Width - 48, tall, Color.White, 4, false);
                 for (int i = start; i < end; ++i)
                 {
                     if (i == ActiveChoice)
                         b.Draw(Game1.staminaRect, new Rectangle((int)Position.X + 4, drawY + (i - ActivePosition) * Height, Width - 48 - 8, Height), null, Color.Wheat, 0, Vector2.Zero, SpriteEffects.None, 0.98f);
-                    b.DrawString(Game1.smallFont, Labels[i], new Vector2(Position.X + 4, drawY + (i - ActivePosition) * Height + 8), Game1.textColor, 0, Vector2.Zero, 1, SpriteEffects.None, 1);
+                    b.DrawString(Game1.smallFont, Choices[i].Label, new Vector2(Position.X + 4, drawY + (i - ActivePosition) * Height + 8), Game1.textColor, 0, Vector2.Zero, 1, SpriteEffects.None, 1);
                 }
             }
         }

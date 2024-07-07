@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SMUI.elements;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 
@@ -189,20 +190,18 @@ namespace SMUI.Elements.Pickers
             };
             popUpBackground.AddChild(intervalSlider);
 
-            var choices = new[]
+            List<Option> options = new()
             {
-                StardewValley.Season.Spring.ToString(),
-                StardewValley.Season.Summer.ToString(),
-                StardewValley.Season.Fall.ToString(),
-                StardewValley.Season.Winter.ToString()
+                new(StardewValley.Season.Spring.ToString()),
+                new(StardewValley.Season.Summer.ToString()),
+                new(StardewValley.Season.Fall.ToString()),
+                new(StardewValley.Season.Winter.ToString())
             };
 
             //Season dropdown
             seasonDropdown = new()
             {
-                Choices = choices,
-                Labels = choices,
-                MaxValuesAtOnce = choices.Length,
+                Choices = options,
                 LocalPosition = new(500, 250),
             };
             seasonDropdown.OnChange += (e) =>
