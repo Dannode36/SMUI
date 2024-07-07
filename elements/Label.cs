@@ -23,7 +23,7 @@ namespace SMUI.Elements
 
         public string String { get; set; } = string.Empty;
 
-        public Action<Element>? Callback { get; set; }
+        public Action<Label>? OnClick { get; set; }
 
         /// <inheritdoc />
         public override int Width => (int)Measure().X;
@@ -32,7 +32,7 @@ namespace SMUI.Elements
         public override int Height => (int)Measure().Y;
 
         /// <inheritdoc />
-        public override string HoveredSound => (Callback != null) ? "shiny4" : string.Empty;
+        public override string HoveredSound => (OnClick != null) ? "shiny4" : string.Empty;
         public override bool Clickable { get; set; } = false;
 
         /*********
@@ -44,7 +44,7 @@ namespace SMUI.Elements
             base.Update(isOffScreen);
 
             if (Clicked)
-                Callback?.Invoke(this);
+                OnClick?.Invoke(this);
         }
 
         /// <summary>Measure the label's rendered dialogue text size.</summary>
@@ -59,7 +59,7 @@ namespace SMUI.Elements
             if (IsHidden())
                 return;
 
-            bool altColor = Hover && Callback != null;
+            bool altColor = Hover && OnClick != null;
             if (Bold)
             {
                 SpriteText.drawString(b, String, (int)Position.X, (int)Position.Y, layerDepth: 1, color: altColor ? SpriteText.color_Gray : null);

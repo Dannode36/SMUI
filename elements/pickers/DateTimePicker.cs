@@ -59,8 +59,8 @@ namespace SMUI.Elements.Pickers
         private const int ButtonHeight = 100;
         private static Vector2 EditorOffset => new(0, 108);
 
-        public event Action<Element>? OnChange;
-        public event Action<Element, bool>? OnToggle;
+        public Action<Element>? OnChange;
+        public Action<Element, bool>? OnToggle;
 
         //Closed UI
         private readonly Button popUpButton;
@@ -181,7 +181,7 @@ namespace SMUI.Elements.Pickers
                 Minimum = 0,
                 Maximum = 28,
                 Interval = 1,
-                RequestWidth = 250,
+                UserWidth = 250,
                 Callback = (e) =>
                 {
                     GhostInterval = (e as Slider<int>)!.Value;
@@ -203,10 +203,10 @@ namespace SMUI.Elements.Pickers
             {
                 Choices = options,
                 LocalPosition = new(500, 250),
-            };
-            seasonDropdown.OnChange += (e) =>
-            {
-                SetSeason(e.Value);
+                OnChange = (e) =>
+                {
+                    SetSeason(e.Value);
+                }
             };
             popUpBackground.AddChild(seasonDropdown);
 

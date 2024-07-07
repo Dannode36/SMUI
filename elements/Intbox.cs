@@ -7,11 +7,11 @@ namespace SMUI.Elements
         *********/
         public int Value
         {
-            get => int.TryParse(this.String, out int value) ? value : 0;
-            set => this.String = value.ToString();
+            get => int.TryParse(String, out int value) ? value : 0;
+            set => String = value.ToString();
         }
 
-        public bool IsValid => int.TryParse(this.String, out _);
+        public bool IsValid => int.TryParse(String, out _);
 
 
         /*********
@@ -24,7 +24,7 @@ namespace SMUI.Elements
             for (int i = 0; i < str.Length; ++i)
             {
                 char c = str[i];
-                if (!char.IsDigit(c) && !(c == '-' && this.String == "" && i == 0))
+                if (!char.IsDigit(c) && !(c == '-' && String == "" && i == 0))
                 {
                     valid = false;
                     break;
@@ -33,8 +33,8 @@ namespace SMUI.Elements
             if (!valid)
                 return;
 
-            this.String += str;
-            this.Callback?.Invoke(this);
+            String += str;
+            Callback?.Invoke(this);
         }
     }
 }

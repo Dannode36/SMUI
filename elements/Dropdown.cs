@@ -37,7 +37,7 @@ namespace SMUI.Elements
 
         public bool Dropped;
 
-        public event Action<Dropdown>? OnChange;
+        public Action<Dropdown>? OnChange;
 
         public static Dropdown? ActiveDropdown;
         public static int SinceDropdownWasActive = 0;

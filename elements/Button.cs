@@ -30,9 +30,6 @@ namespace SMUI.Elements
         /// <inheritdoc />
         public override string HoveredSound => "Cowboy_Footstep";
 
-        public float Scale { get; set; } = 4f;
-        private float ScaleFactor = 1f;
-
         /*********
         ** Public methods
         *********/
@@ -61,8 +58,6 @@ namespace SMUI.Elements
         {
             base.Update(isOffScreen);
 
-            ScaleFactor = Hover ? Math.Min(ScaleFactor + 0.013f, 1.083f) : Math.Max(ScaleFactor - 0.013f, 1f);
-
             if (Clicked)
                 Callback?.Invoke(this);
         }
@@ -73,7 +68,7 @@ namespace SMUI.Elements
             if (IsHidden())
                 return;
 
-            IClickableMenu.drawTextureBox(b, Game1.mouseCursors, TextureRect, (int)Position.X, (int)Position.Y, Width, Height, Hover ? HoverTint : IdleTint, 4f, drawShadow: false);
+            IClickableMenu.drawTextureBox(b, Game1.mouseCursors, TextureRect, (int)Position.X, (int)Position.Y, Width, Height, Hover ? HoverTint : IdleTint, Game1.pixelZoom, drawShadow: false);
         }
     }
 }

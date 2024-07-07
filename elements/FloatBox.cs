@@ -9,11 +9,11 @@ namespace SMUI.Elements
         *********/
         public float Value
         {
-            get => float.TryParse(this.String, out float value) ? value : 0f;
-            set => this.String = value.ToString();
+            get => float.TryParse(String, out float value) ? value : 0f;
+            set => String = value.ToString();
         }
 
-        public bool IsValid => float.TryParse(this.String, out _);
+        public bool IsValid => float.TryParse(String, out _);
 
 
         /*********
@@ -22,12 +22,12 @@ namespace SMUI.Elements
         /// <inheritdoc />
         protected override void ReceiveInput(string str)
         {
-            bool hasDot = this.String.Contains('.');
+            bool hasDot = String.Contains('.');
             bool valid = true;
             for (int i = 0; i < str.Length; ++i)
             {
                 char c = str[i];
-                if (!char.IsDigit(c) && !(c == '.' && !hasDot) && !(c == '-' && this.String == "" && i == 0))
+                if (!char.IsDigit(c) && !(c == '.' && !hasDot) && !(c == '-' && String == "" && i == 0))
                 {
                     valid = false;
                     break;
@@ -38,8 +38,8 @@ namespace SMUI.Elements
             if (!valid)
                 return;
 
-            this.String += str;
-            this.Callback?.Invoke(this);
+            String += str;
+            Callback?.Invoke(this);
         }
     }
 }

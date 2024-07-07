@@ -40,7 +40,7 @@ namespace SMUI.Elements
             }
         }
 
-        public Action<Element>? Callback { get; set; }
+        public Action<Textbox>? Callback { get; set; }
 
         /// <inheritdoc />
         public override int Width => 192;
