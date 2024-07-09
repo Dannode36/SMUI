@@ -32,19 +32,29 @@ namespace SMUI.Elements
         {
             base.Update( hidden );
 
-            if ( Hover )
+            if (Hover)
+            {
                 HoveredElement = this;
-            else if ( HoveredElement == this )
+            }
+            else if (HoveredElement == this)
+            {
                 HoveredElement = null;
+            }
 
-            if ( Clicked && Callback != null )
-                Callback.Invoke( this );
+            if (Clicked && Callback != null)
+            {
+                Callback.Invoke(this);
+            }
 
-
-            bool SecondaryClickGestured = (Game1.input.GetMouseState().RightButton == ButtonState.Pressed && Game1.oldMouseState.RightButton == ButtonState.Released);
-            SecondaryClickGestured = SecondaryClickGestured || (Game1.options.gamepadControls && (Game1.input.GetGamePadState().IsButtonDown(Buttons.B) && !Game1.oldPadState.IsButtonDown(Buttons.B)));
+            bool SecondaryClickGestured = (Game1.input.GetMouseState().RightButton == ButtonState.Pressed
+                && Game1.oldMouseState.RightButton == ButtonState.Released)
+                || (Game1.options.gamepadControls
+                    && Game1.input.GetGamePadState().IsButtonDown(Buttons.B)
+                    && !Game1.oldPadState.IsButtonDown(Buttons.B));
             if (Hover && SecondaryClickGestured && SecondaryCallback != null)
+            {
                 SecondaryCallback.Invoke(this);
+            }
         }
 
         public override void Draw( SpriteBatch b )
@@ -52,9 +62,13 @@ namespace SMUI.Elements
             if (BoxColor.HasValue)
             {
                 if (BoxIsThin)
+                {
                     b.Draw(Game1.menuTexture, Position, Game1.getSourceRectForStandardTileSheet(Game1.menuTexture, 10), BoxColor.Value, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.5f);
+                }
                 else
+                {
                     IClickableMenu.drawTextureBox(b, (int)Position.X, (int)Position.Y, Width, Height, BoxColor.Value);
+                }
             }
             ItemDisplay?.drawInMenu( b, Position + (BoxIsThin ? Vector2.Zero : new Vector2( 16, 16 )), 1, TransparentItemDisplay ? 0.5f : 1, 1 );
         }

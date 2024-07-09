@@ -23,33 +23,7 @@ namespace SMUI.Elements.Pickers
             get => m_ghostInterval;
             set
             {
-                if (m_ghostInterval > 0)
-                {
-                    for (int i = 0; i < daySelectors.Count; i++)
-                    {
-                        if ((i + Day) % m_ghostInterval == 0)
-                        {
-                            daySelectors[i].IdleTint = Button.IdleTintColour; //Reset the previous day button colour
-                            daySelectors[i].HoverTint = Button.HoverTintColour;
-                            daySelectorLabels[i].IdleTextColor = Game1.textColor; //Reset the previous day label colour
-                        }
-                    }
-                }
-
-                m_ghostInterval = value;
-                if(m_ghostInterval > 0)
-                {
-                    for (int i = 0; i < daySelectors.Count; i++)
-                    {
-                        if ((i + Day) % m_ghostInterval == 0)
-                        {
-                            daySelectors[i].IdleTint = Color.PaleGreen; //Highlight the current day button
-                            daySelectors[i].HoverTint = Color.LightGreen;
-                            daySelectorLabels[i].IdleTextColor = Color.WhiteSmoke; //Change label to white for better contrast
-                        }
-                    }
-                }
-                OnChange?.Invoke(this);
+                SetHighlight(Day, value);
             }
         }
 
@@ -76,19 +50,24 @@ namespace SMUI.Elements.Pickers
         private const int DayButtonOffset = 4;
         private readonly List<Button> daySelectors;
         private readonly List<Label> daySelectorLabels;
-        private readonly Slider<int> intervalSlider;
+        private readonly Intbox intervalInput;
         
         private readonly Dropdown seasonDropdown;
-        public DateTimePicker() : this(Vector2.Zero) { }
+        public DateTimePicker() : this(Vector2.Zero, Game1.timeOfDay, SDate.Now(), 0) { }
 
-        public DateTimePicker(Vector2 buttonSize)
+        public DateTimePicker(Vector2 buttonSize, int time, SDate date, int interval)
         {
-            Clickable = false;
+            Time = time;
+            Day = date.Day;
+            Season = date.Season.ToString();
+            Year = date.Year;
+            m_ghostInterval = interval;
 
             if(buttonSize == Vector2.Zero)
             {
                 buttonSize = new(ButtonWidth, ButtonHeight);
             }
+            Clickable = false;
 
             popUpButton = new(Game1.mouseCursors, new(384, 396, 15, 15), buttonSize)
             {
@@ -102,7 +81,8 @@ namespace SMUI.Elements.Pickers
 
             popUpButtonLabel = new();
             AddChild(popUpButtonLabel);
-
+            
+            //Open UI
             popUpBackground = new()
             {
                 Size = new(Width, Height),
@@ -140,6 +120,7 @@ namespace SMUI.Elements.Pickers
                     LocalPosition = buttonPos,
                     Callback = (e) =>
                     {
+                        Day = day;
                         SetHighlight(day);
                     }
                 });
@@ -161,7 +142,7 @@ namespace SMUI.Elements.Pickers
                 popUpBackground.AddChild(daySelectorLabels[i]);
             }
 
-            //Day names for the selector columns
+            //Day names for the calendar columns
             for (int i = 0; i < 7; i++)
             {
                 Label name = new()
@@ -176,19 +157,16 @@ namespace SMUI.Elements.Pickers
                 popUpBackground.AddChild(name);
             }
 
-            intervalSlider = new()
+            intervalInput = new()
             {
-                Minimum = 0,
-                Maximum = 28,
-                Interval = 1,
-                UserWidth = 250,
+                Value = GhostInterval,
                 Callback = (e) =>
                 {
-                    GhostInterval = (e as Slider<int>)!.Value;
+                    GhostInterval = (e as Intbox)!.Value;
                 },
                 LocalPosition = new(0, 0)
             };
-            popUpBackground.AddChild(intervalSlider);
+            popUpBackground.AddChild(intervalInput);
 
             List<Option> options = new()
             {
@@ -210,34 +188,36 @@ namespace SMUI.Elements.Pickers
             };
             popUpBackground.AddChild(seasonDropdown);
 
+            UpdateDateLabel();
             SetHighlight(Day);
         }
 
-        public void SetHighlight(int day, int ghostInterval = 0)
+        public void SetHighlight(int day, int newGhostInterval = -1)
         {
             daySelectors[Day - 1].IdleTint = Button.IdleTintColour; //Reset the previous day button colour
             daySelectors[Day - 1].HoverTint = Button.HoverTintColour;
             daySelectorLabels[Day - 1].IdleTextColor = Game1.textColor; //Reset the previous day label colour
 
-            Day = day;
-            UpdateDateLabel();
-            OnChange?.Invoke(this);
-
-            if (m_ghostInterval > 0)
+            if (GhostInterval > 0)
             {
                 for (int i = 0; i < daySelectors.Count; i++)
                 {
-                    if ((i + Day) % m_ghostInterval == 0)
-                    {
-                        daySelectors[i].IdleTint = Button.IdleTintColour; //Reset the previous day button colour
-                        daySelectors[i].HoverTint = Button.HoverTintColour;
-                        daySelectorLabels[i].IdleTextColor = Game1.textColor; //Reset the previous day label colour
-                    }
+                    daySelectors[i].IdleTint = Button.IdleTintColour; //Reset the previous day button colour
+                    daySelectors[i].HoverTint = Button.HoverTintColour;
+                    daySelectorLabels[i].IdleTextColor = Game1.textColor; //Reset the previous day label colour
                 }
+            }
 
-                for (int i = 0; i < daySelectors.Count; i++)
+            if(newGhostInterval != -1)
+            {
+                m_ghostInterval = newGhostInterval;
+            }
+
+            if (GhostInterval > 0)
+            {
+                for (int i = Day - 1; i < daySelectors.Count; i++)
                 {
-                    if ((i + Day) % m_ghostInterval == 0)
+                    if ((i - (Day - 1)) % GhostInterval == 0)
                     {
                         daySelectors[i].IdleTint = Color.PaleGreen; //Highlight the current day button
                         daySelectors[i].HoverTint = Color.LightGreen;
@@ -249,7 +229,7 @@ namespace SMUI.Elements.Pickers
             daySelectors[Day - 1].IdleTint = Color.LightSeaGreen; //Highlight the current day button
             daySelectors[Day - 1].HoverTint = Color.SeaGreen;
             daySelectorLabels[Day - 1].IdleTextColor = Color.White; //Change label to white for better contrast
-
+            OnChange?.Invoke(this);
         }
 
         public void SetSeason(string season)
