@@ -19,13 +19,19 @@ namespace SMUI.Elements
 
         public Action<Element>? Callback { get; set; }
 
+        /// <summary>Size of button when using box draw</summary>
         public Vector2 Size { get; set; }
 
-        /// <inheritdoc />
-        public override int Width => (int)Size.X;
+        /// <summary>When true draws the texture to fit a box. When false draws the texture rect as is</summary>
+        public bool BoxDraw {  get; set; } = true;
+
+        public int Scale { get; set; } = Game1.pixelZoom;
 
         /// <inheritdoc />
-        public override int Height => (int)Size.Y;
+        public override int Width => BoxDraw ? (int)Size.X : TextureRect.Width * Scale;
+
+        /// <inheritdoc />
+        public override int Height => BoxDraw ? (int)Size.Y : TextureRect.Height * Scale;
 
         /// <inheritdoc />
         public override string HoveredSound => "Cowboy_Footstep";
@@ -35,20 +41,18 @@ namespace SMUI.Elements
         *********/
         public Button() { }
 
-        public Button(Texture2D tex, Rectangle rect, Vector2 size)
+        public Button(Texture2D tex, Rectangle rect)
         {
             Texture = tex;
             TextureRect = rect;
-            Size = size;
             IdleTint = Color.White;
             HoverTint = Color.Wheat;
         }
 
-        public Button(Texture2D tex, Rectangle rect, Vector2 size, Color idleTint, Color hoverTint)
+        public Button(Texture2D tex, Rectangle rect, Color idleTint, Color hoverTint)
         {
             Texture = tex;
             TextureRect = rect;
-            Size = size;
             IdleTint = idleTint;
             HoverTint = hoverTint;
         }
@@ -68,7 +72,14 @@ namespace SMUI.Elements
             if (IsHidden())
                 return;
 
-            IClickableMenu.drawTextureBox(b, Game1.mouseCursors, TextureRect, (int)Position.X, (int)Position.Y, Width, Height, Hover ? HoverTint : IdleTint, Game1.pixelZoom, drawShadow: false);
+            if (BoxDraw)
+            {
+                IClickableMenu.drawTextureBox(b, Game1.mouseCursors, TextureRect, (int)Position.X, (int)Position.Y, Width, Height, Hover ? HoverTint : IdleTint, Scale, drawShadow: false);
+            }
+            else
+            {
+                b.Draw(Texture, Position, TextureRect, Hover ? HoverTint : IdleTint, 0, Vector2.Zero, Scale, SpriteEffects.None, 1);
+            }
         }
     }
 }

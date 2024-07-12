@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using StardewValley;
 
 namespace SMUI.Elements
 {
@@ -13,12 +14,13 @@ namespace SMUI.Elements
         public Texture2D? Texture { get; set; }
 
         /// <summary>The pixel area within the texture to display, or <c>null</c> to show the entire image.</summary>
-        public Rectangle? TexturePixelArea { get; set; }
+        public Rectangle? TextureArea { get; set; }
 
         /// <summary>The zoom factor to apply to the image.</summary>
-        public int Scale { get; set; }
+        public float Scale { get; set; } = Game1.pixelZoom;
 
-        public Action<Element>? Callback { get; set; }
+        public override bool Clickable { get; set; } = false;
+        public Action<Image>? OnClick { get; set; }
 
         /// <inheritdoc />
         public override int Width => (int)GetActualSize().X;
@@ -27,7 +29,7 @@ namespace SMUI.Elements
         public override int Height => (int)GetActualSize().Y;
 
         /// <inheritdoc />
-        public override string HoveredSound => (Callback != null) ? "shiny4" : string.Empty;
+        public override string HoveredSound => (Clickable) ? "shiny4" : string.Empty;
 
         public Color DrawColor { get; set; } = Color.White;
 
@@ -40,7 +42,7 @@ namespace SMUI.Elements
             base.Update(isOffScreen);
 
             if (Clicked)
-                Callback?.Invoke(this);
+                OnClick?.Invoke(this);
         }
 
         /// <inheritdoc />
@@ -49,17 +51,16 @@ namespace SMUI.Elements
             if (IsHidden())
                 return;
 
-            b.Draw(Texture, Position, TexturePixelArea, DrawColor, 0, Vector2.Zero, Scale, SpriteEffects.None, 1);
+            b.Draw(Texture, Position, TextureArea, DrawColor, 0, Vector2.Zero, Scale, SpriteEffects.None, 1);
         }
-
 
         /*********
         ** Private methods
         *********/
         private Vector2 GetActualSize()
         {
-            if (TexturePixelArea.HasValue)
-                return new Vector2(TexturePixelArea.Value.Width, TexturePixelArea.Value.Height) * Scale;
+            if (TextureArea.HasValue)
+                return new Vector2(TextureArea.Value.Width, TextureArea.Value.Height) * Scale;
             else
                 return Texture == null ? Vector2.Zero : new Vector2(Texture.Width, Texture.Height) * Scale;
         }

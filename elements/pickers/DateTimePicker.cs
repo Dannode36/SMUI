@@ -23,7 +23,7 @@ namespace SMUI.Elements.Pickers
             get => m_ghostInterval;
             set
             {
-                SetHighlight(Day, value);
+                UpdateHighlight();
             }
         }
 
@@ -69,8 +69,9 @@ namespace SMUI.Elements.Pickers
             }
             Clickable = false;
 
-            popUpButton = new(Game1.mouseCursors, new(384, 396, 15, 15), buttonSize)
+            popUpButton = new(Game1.mouseCursors, new(384, 396, 15, 15))
             {
+                Size = buttonSize,
                 Callback = (e) =>
                 { 
                     Open = !Open;
@@ -91,8 +92,9 @@ namespace SMUI.Elements.Pickers
             };
             AddChild(popUpBackground);
 
-            closeButton = new(Game1.mouseCursors, new Rectangle(337, 494, 12, 12), new(48, 48))
+            closeButton = new(Game1.mouseCursors, new Rectangle(337, 494, 12, 12))
             {
+                Size = new(48, 48),
                 Callback = (e) =>
                 {
                     Open = false;
@@ -115,13 +117,14 @@ namespace SMUI.Elements.Pickers
                 Vector2 buttonPos = new(
                     DaySelectorPosition.X + ((DayButtonWidth + DayButtonOffset) * col), 
                     DaySelectorPosition.Y + ((DayButtonWidth + DayButtonOffset) * row));
-                daySelectors.Add(new(Game1.mouseCursors, new(432, 439, 9, 9), new(DayButtonWidth, DayButtonWidth))
+                daySelectors.Add(new(Game1.mouseCursors, new(432, 439, 9, 9))
                 {
+                    Size = new(DayButtonWidth, DayButtonWidth),
                     LocalPosition = buttonPos,
                     Callback = (e) =>
                     {
                         Day = day;
-                        SetHighlight(day);
+                        UpdateHighlight();
                     }
                 });
                 popUpBackground.AddChild(daySelectors[i]);
@@ -189,10 +192,10 @@ namespace SMUI.Elements.Pickers
             popUpBackground.AddChild(seasonDropdown);
 
             UpdateDateLabel();
-            SetHighlight(Day);
+            UpdateHighlight();
         }
 
-        public void SetHighlight(int day, int newGhostInterval = -1)
+        public void UpdateHighlight()
         {
             daySelectors[Day - 1].IdleTint = Button.IdleTintColour; //Reset the previous day button colour
             daySelectors[Day - 1].HoverTint = Button.HoverTintColour;
@@ -206,11 +209,6 @@ namespace SMUI.Elements.Pickers
                     daySelectors[i].HoverTint = Button.HoverTintColour;
                     daySelectorLabels[i].IdleTextColor = Game1.textColor; //Reset the previous day label colour
                 }
-            }
-
-            if(newGhostInterval != -1)
-            {
-                m_ghostInterval = newGhostInterval;
             }
 
             if (GhostInterval > 0)

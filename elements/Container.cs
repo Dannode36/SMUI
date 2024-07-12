@@ -62,12 +62,14 @@ namespace SMUI.Elements
             element.Parent = this;
         }
 
-        public void RemoveChild(Element element)
+        public bool RemoveChild(Element element)
         {
             if (element.Parent != this)
-                throw new ArgumentException("Element must be a child of this container.");
-            ChildrenImpl.Remove(element);
+            {
+                return false;
+            }
             element.Parent = null;
+            return ChildrenImpl.Remove(element);
         }
 
         /// <inheritdoc />
