@@ -197,16 +197,16 @@ namespace SMUI.Elements.Pickers
 
         public void UpdateHighlight()
         {
-            daySelectors[Day - 1].IdleTint = Button.IdleTintColour; //Reset the previous day button colour
-            daySelectors[Day - 1].HoverTint = Button.HoverTintColour;
+            daySelectors[Day - 1].IdleTint = Button.DefaultIdleTint; //Reset the previous day button colour
+            daySelectors[Day - 1].HoverTint = Button.DefaultHoverTint;
             daySelectorLabels[Day - 1].IdleTextColor = Game1.textColor; //Reset the previous day label colour
 
             if (GhostInterval > 0)
             {
                 for (int i = 0; i < daySelectors.Count; i++)
                 {
-                    daySelectors[i].IdleTint = Button.IdleTintColour; //Reset the previous day button colour
-                    daySelectors[i].HoverTint = Button.HoverTintColour;
+                    daySelectors[i].IdleTint = Button.DefaultIdleTint; //Reset the previous day button colour
+                    daySelectors[i].HoverTint = Button.DefaultHoverTint;
                     daySelectorLabels[i].IdleTextColor = Game1.textColor; //Reset the previous day label colour
                 }
             }

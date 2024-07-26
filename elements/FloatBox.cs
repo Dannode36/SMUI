@@ -4,9 +4,6 @@ namespace SMUI.Elements
 {
     public class Floatbox : Textbox
     {
-        /*********
-        ** Accessors
-        *********/
         public float Value
         {
             get => float.TryParse(String, out float value) ? value : 0f;
@@ -15,10 +12,8 @@ namespace SMUI.Elements
 
         public bool IsValid => float.TryParse(String, out _);
 
+        public float Interval { get; set; } = 1f;
 
-        /*********
-        ** Protected methods
-        *********/
         /// <inheritdoc />
         protected override void ReceiveInput(string str)
         {

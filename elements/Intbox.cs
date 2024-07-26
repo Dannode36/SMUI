@@ -2,9 +2,6 @@ namespace SMUI.Elements
 {
     public class Intbox : Textbox
     {
-        /*********
-        ** Accessors
-        *********/
         public int Value
         {
             get => int.TryParse(String, out int value) ? value : 0;
@@ -13,10 +10,8 @@ namespace SMUI.Elements
 
         public bool IsValid => int.TryParse(String, out _);
 
+        public int Interval { get; set; } = 1;
 
-        /*********
-        ** Protected methods
-        *********/
         /// <inheritdoc />
         protected override void ReceiveInput(string str)
         {

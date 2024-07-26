@@ -35,6 +35,15 @@ namespace SMUI.Elements
         public override string HoveredSound => (OnClick != null) ? "shiny4" : string.Empty;
         public override bool Clickable { get; set; } = false;
 
+        public Label() { }
+        public Label(string str, float scale, bool bold, SpriteFont? font = null)
+        {
+            String = str;
+            NonBoldScale = scale;
+            Bold = bold;
+            if(font == null) Font = Game1.dialogueFont;
+        }
+
         /*********
         ** Public methods
         *********/

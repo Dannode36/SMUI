@@ -33,6 +33,14 @@ namespace SMUI.Elements
 
         public Color DrawColor { get; set; } = Color.White;
 
+        public Image() { }
+        public Image(Texture2D? texture, Rectangle? textureArea, float scale = Game1.pixelZoom)
+        {
+            Texture = texture;
+            TextureArea = textureArea;
+            Scale = scale;
+        }
+
         /*********
         ** Public methods
         *********/
