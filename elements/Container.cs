@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewValley;
+using StardewValley.Characters;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace SMUI.Elements
@@ -18,28 +19,27 @@ namespace SMUI.Elements
         /// <summary>Whether to update the <see cref="Children"/> when <see cref="Update"/> is called.</summary>
         protected bool UpdateChildren { get; set; } = true;
 
+        public virtual bool Shadow { get; set; } = true;
 
-        /*********
-        ** Accessors
-        *********/
         private Element? renderLast = null;
         public Element? RenderLast
         {
             get => renderLast;
-            set {
+            set
+            {
                 renderLast = value;
-                if (Parent != null) 
+                if (Parent != null)
                 {
-                    if (value == null) 
+                    if (value == null)
                     {
-                        if (Parent.RenderLast == this) 
+                        if (Parent.RenderLast == this)
                         {
                             Parent.RenderLast = null;
                         }
-                    } 
-                    else 
-                    {
-                        Parent.RenderLast = this;
+                        else
+                        {
+                            Parent.RenderLast = this;
+                        }
                     }
                 }
             }
@@ -77,6 +77,7 @@ namespace SMUI.Elements
         {
             base.Update(isOffScreen);
 
+            RenderLast = null;
             ClickConsumed = false;
             ClickConsumer = null;
 
@@ -86,6 +87,10 @@ namespace SMUI.Elements
                 {
                     ChildrenImpl[i].Update(isOffScreen);
 
+                    if (ChildrenImpl[i].Hover && string.IsNullOrEmpty(ChildrenImpl[i].Tooltip))
+                    {
+                        RenderLast = ChildrenImpl[i];
+                    }
                 }
             }
 
@@ -101,12 +106,11 @@ namespace SMUI.Elements
         {
             if (IsHidden())
                 return;
-
-            foreach (var child in ChildrenImpl)
+            for (int i = ChildrenImpl.Count - 1; i >= 0; i--)
             {
-                if (child == RenderLast)
+                if (ChildrenImpl[i] == RenderLast)
                     continue;
-                child.Draw(b);
+                ChildrenImpl[i].Draw(b);
             }
             RenderLast?.Draw(b);
         }

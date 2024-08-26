@@ -6,18 +6,18 @@ namespace SMUI
 {
     public class Utilities
     {
-        public static string NameOfDay(int day, bool full = false)
+        public static string NameOfDay(int day, bool shortened = false)
         {
             return ((day - 1) % 7) switch
             {
-                0 => full ? "Monday" : "Mon",
-                1 => full ? "Tuesday" : "Tue",
-                2 => full ? "Wednesday" : "Wed",
-                3 => full ? "Thursday" : "Thu",
-                4 => full ? "Friday" : "Fri",
-                5 => full ? "Saturday" : "Sat",
-                6 => full ? "Sunday" : "Sun",
-                _ => "###",
+                0 => shortened ? "Mon" : "Monday" ,
+                1 => shortened ? "Tue" : "Tuesday",
+                2 => shortened ? "Wed" : "Wednesday",
+                3 => shortened ? "Thu" : "Thursday",
+                4 => shortened ? "Fri" : "Friday",
+                5 => shortened ? "Sat" : "Saturday",
+                6 => shortened ? "Sun" : "Sunday",
+                _ => "###"
             };
         }
 

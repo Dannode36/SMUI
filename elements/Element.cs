@@ -32,6 +32,7 @@ namespace SMUI.Elements
 
         public bool Hover { get; private set; }
         public virtual string HoveredSound => string.Empty;
+        public virtual string Tooltip { get; set; } = string.Empty;
 
         public virtual bool Clickable { get; set; } = true;
         public bool ClickGestured { get; private set; }
@@ -61,17 +62,17 @@ namespace SMUI.Elements
                 return;
             }
 
-            int mouseX;
-            int mouseY;
+            float mouseX;
+            float mouseY;
             if (Constants.TargetPlatform == GamePlatform.Android)
             {
-                mouseX = Game1.getMouseX();
-                mouseY = Game1.getMouseY();
+                mouseX = Game1.getMouseX() / Game1.options.uiScale;
+                mouseY = Game1.getMouseY() / Game1.options.uiScale;
             }
             else
             {
-                mouseX = Game1.getOldMouseX();
-                mouseY = Game1.getOldMouseY();
+                mouseX = Game1.getOldMouseX() / Game1.options.uiScale;
+                mouseY = Game1.getOldMouseY() / Game1.options.uiScale;
             }
 
             bool newHover = !hidden && !GetRoot().Obscured && Bounds.Contains(mouseX, mouseY);

@@ -1,4 +1,5 @@
 using System;
+using System.Reflection.Emit;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
@@ -23,15 +24,18 @@ namespace SMUI.Elements
         public Vector2 Size { get; set; }
 
         /// <summary>When true draws the texture to fit a box. When false draws the texture rect as is</summary>
-        public bool BoxDraw {  get; set; } = true;
+        public bool BoxDraw { get; set; } = true;
 
-        public int Scale { get; set; } = Game1.pixelZoom;
+        public float Scale { get; set; } = Game1.pixelZoom;
+        public float HoverScale { get; set; } = Game1.pixelZoom + 0.22f;
+        public float ScaleSpeed { get; set; } = 0.034f;
+        public float m_trueScale { get; private set; }
 
         /// <inheritdoc />
-        public override int Width => BoxDraw ? (int)Size.X : TextureRect.Width * Scale;
+        public override int Width => BoxDraw ? (int)Size.X : TextureRect.Width * (int)Scale;
 
         /// <inheritdoc />
-        public override int Height => BoxDraw ? (int)Size.Y : TextureRect.Height * Scale;
+        public override int Height => BoxDraw ? (int)Size.Y : TextureRect.Height * (int)Scale;
 
         /// <inheritdoc />
         public override string HoveredSound => "Cowboy_Footstep";
@@ -47,6 +51,7 @@ namespace SMUI.Elements
             TextureRect = rect;
             IdleTint = Color.White;
             HoverTint = Color.Wheat;
+            m_trueScale = Scale;
         }
 
         public Button(Texture2D tex, Rectangle rect, Color idleTint, Color hoverTint)
@@ -55,12 +60,15 @@ namespace SMUI.Elements
             TextureRect = rect;
             IdleTint = idleTint;
             HoverTint = hoverTint;
+            m_trueScale = Scale;
         }
 
         /// <inheritdoc />
         public override void Update(bool isOffScreen = false)
         {
             base.Update(isOffScreen);
+
+            m_trueScale = Hover ? Math.Min(m_trueScale + ScaleSpeed, HoverScale) : Math.Max(m_trueScale - ScaleSpeed, Scale);
 
             if (Clicked)
                 Callback?.Invoke(this);
@@ -78,7 +86,12 @@ namespace SMUI.Elements
             }
             else
             {
-                b.Draw(Texture, Position, TextureRect, Hover ? HoverTint : IdleTint, 0, Vector2.Zero, Scale, SpriteEffects.None, 1);
+                b.Draw(Texture, Position + (new Vector2(Width, Height) * 0.5f), TextureRect, Hover ? HoverTint : IdleTint, 0, TextureRect.Size.ToVector2() / 2f, m_trueScale, SpriteEffects.None, 1);
+            }
+
+            if (Hover && !string.IsNullOrEmpty(Tooltip))
+            {
+                IClickableMenu.drawHoverText(b, Tooltip, Game1.smallFont);
             }
         }
     }

@@ -3,11 +3,10 @@ using Microsoft.Xna.Framework.Graphics;
 using SMUI.elements;
 using StardewModdingAPI.Utilities;
 using StardewValley;
-using System.ComponentModel;
 
 namespace SMUI.Elements.Pickers
 {
-    public class DateTimePicker : Container
+    public class DateTimePickerPopup : Container
     {
         public override int Width => 800;
         public override int Height => 500;
@@ -28,26 +27,35 @@ namespace SMUI.Elements.Pickers
             }
         }
 
+        public bool Open { get; private set; }
+
         private const int ButtonWidth = 600;
         private const int ButtonHeight = 100;
-        private const int DayPerRow = 7;
-        private const int DayButtonWidth = 52;
-        private const int DayButtonOffset = 4;
-
         private static Vector2 EditorOffset => new(0, 108);
-        private static Vector2 DaySelectorPosition => new(50, 100);
 
         public Action<Element>? OnChange;
         public Action<Element, bool>? OnToggle;
 
-        private readonly StaticContainer container;
+        //Closed UI
+        private readonly Button popUpButton;
+        private readonly Label popUpButtonLabel;
+
+        //Open UI
+        private readonly StaticContainer popUpBackground;
+        private readonly Button closeButton;
+
+        private const int DayPerRow = 7;
+        private static Vector2 DaySelectorPosition => new(50, 100);
+        private const int DayButtonWidth = 52;
+        private const int DayButtonOffset = 4;
         private readonly List<Button> daySelectors;
         private readonly List<Label> daySelectorLabels;
         private readonly Intbox intervalInput;
+        
         private readonly Dropdown seasonDropdown;
+        public DateTimePickerPopup() : this(Vector2.Zero, Game1.timeOfDay, SDate.Now(), 0) { }
 
-        public DateTimePicker() : this(Vector2.Zero, Game1.timeOfDay, SDate.Now(), 0) { }
-        public DateTimePicker(Vector2 buttonSize, int time, SDate date, int interval)
+        public DateTimePickerPopup(Vector2 buttonSize, int time, SDate date, int interval)
         {
             Time = time;
             Day = date.Day;
@@ -61,13 +69,40 @@ namespace SMUI.Elements.Pickers
             }
             Clickable = false;
 
-            container = new()
+            popUpButton = new(Game1.mouseCursors, new(384, 396, 15, 15))
+            {
+                Size = buttonSize,
+                Callback = (e) =>
+                { 
+                    Open = !Open;
+                    popUpBackground!.Enabled = Open;
+                }
+            };
+            AddChild(popUpButton);
+
+            popUpButtonLabel = new();
+            AddChild(popUpButtonLabel);
+            
+            //Open UI
+            popUpBackground = new()
             {
                 Size = new(Width, Height),
                 OutlineColor = Color.Wheat,
                 LocalPosition = EditorOffset
             };
-            AddChild(container);
+            AddChild(popUpBackground);
+
+            closeButton = new(Game1.mouseCursors, new Rectangle(337, 494, 12, 12))
+            {
+                Size = new(48, 48),
+                Callback = (e) =>
+                {
+                    Open = false;
+                    popUpBackground!.Enabled = false;
+                },
+                LocalPosition = new Vector2(Width, -20)
+            };
+            popUpBackground.AddChild(closeButton);
 
             //Init date buttons
             daySelectors = new();
@@ -92,7 +127,7 @@ namespace SMUI.Elements.Pickers
                         UpdateHighlight();
                     }
                 });
-                container.AddChild(daySelectors[i]);
+                popUpBackground.AddChild(daySelectors[i]);
 
                 //Label
                 string labelString = (i + 1).ToString();
@@ -107,7 +142,7 @@ namespace SMUI.Elements.Pickers
                     buttonPos.X + ((DayButtonWidth - daySelectorLabels[i].Width) / 2),
                     buttonPos.Y + ((DayButtonWidth - daySelectorLabels[i].Height) / 2));
                 daySelectorLabels[i].LocalPosition = labelPos;
-                container.AddChild(daySelectorLabels[i]);
+                popUpBackground.AddChild(daySelectorLabels[i]);
             }
 
             //Day names for the calendar columns
@@ -122,7 +157,7 @@ namespace SMUI.Elements.Pickers
                         DaySelectorPosition.X + ((DayButtonWidth + DayButtonOffset) * i) + (DayButtonWidth - name.Width) / 2,
                         DaySelectorPosition.Y - 32);
 
-                container.AddChild(name);
+                popUpBackground.AddChild(name);
             }
 
             intervalInput = new()
@@ -134,7 +169,7 @@ namespace SMUI.Elements.Pickers
                 },
                 LocalPosition = new(0, 0)
             };
-            container.AddChild(intervalInput);
+            popUpBackground.AddChild(intervalInput);
 
             List<Option> options = new()
             {
@@ -154,8 +189,9 @@ namespace SMUI.Elements.Pickers
                     SetSeason(e.Value);
                 }
             };
-            container.AddChild(seasonDropdown);
+            popUpBackground.AddChild(seasonDropdown);
 
+            UpdateDateLabel();
             UpdateHighlight();
         }
 
@@ -197,12 +233,21 @@ namespace SMUI.Elements.Pickers
         public void SetSeason(string season)
         {
             Season = season;
+            UpdateDateLabel();
             OnChange?.Invoke(this);
         }
 
         public override string ToString()
         {
             return $"{Date.ToLocaleString()} - {Time} {(Time < 1200 ? "am" : "pm")}";
+        }
+
+        private void UpdateDateLabel()
+        {
+            popUpButtonLabel.String = ToString();
+            popUpButtonLabel.LocalPosition = new(
+                (ButtonWidth - popUpButtonLabel.Width) / 2,
+                (ButtonHeight - popUpButtonLabel.Height) / 2);
         }
 
         public override void Update(bool isOffScreen = false)
@@ -212,7 +257,23 @@ namespace SMUI.Elements.Pickers
 
         public override void Draw(SpriteBatch b)
         {
-            container.Draw(b);
+            popUpButton.Draw(b);
+            popUpButtonLabel.Draw(b);
+
+            if (Open)
+            {
+                const int padding = 64;
+                Rectangle contentArea = new(
+                    (int)popUpBackground.Position.X - padding,
+                    (int)popUpBackground.Position.Y - padding,
+                    popUpBackground.Width + 2 * padding,
+                    popUpBackground.Height + 2 * padding);
+
+                Utilities.InScissorRectangle(b, contentArea, contentBatch =>
+                {
+                    popUpBackground.Draw(contentBatch);
+                });
+            }
         }
     }
 }
