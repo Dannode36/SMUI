@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -17,6 +17,7 @@
 	<PackageProjectUrl>https://github.com/Dannode36/SMUI</PackageProjectUrl>
 	<Description>UI library designed for SMAPI (Stardew Valley Modding API)</Description>
 	<PackageLicenseFile>LICENSE</PackageLicenseFile>
+	<GamePath>D:\SteamLibrary\steamapps\common\Stardew Valley</GamePath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -28,26 +29,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="MonoGame.Framework">
-      <HintPath>assemblies\MonoGame.Framework.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Stardew Valley">
-      <HintPath>assemblies\Stardew Valley.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="StardewModdingAPI">
-      <HintPath>assemblies\StardewModdingAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="StardewValley.GameData">
-      <HintPath>assemblies\StardewValley.GameData.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="xTile">
-      <HintPath>assemblies\xTile.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
+    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
   </ItemGroup>
 
   <ItemGroup>

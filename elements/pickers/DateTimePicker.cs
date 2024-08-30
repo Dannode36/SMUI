@@ -116,7 +116,7 @@ namespace SMUI.Elements.Pickers
                 Label name = new()
                 {
                     Font = Game1.smallFont,
-                    String = Utilities.NameOfDay(i + 1),
+                    String = Utilities.NameOfDay(i + 1, true),
                 };
                 name.LocalPosition = new(
                         DaySelectorPosition.X + ((DayButtonWidth + DayButtonOffset) * i) + (DayButtonWidth - name.Width) / 2,

@@ -1,5 +1,6 @@
 using System;
 using System.Reflection.Emit;
+using System.Xml.Serialization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
@@ -24,21 +25,22 @@ namespace SMUI.Elements
         public Vector2 Size { get; set; }
 
         /// <summary>When true draws the texture to fit a box. When false draws the texture rect as is</summary>
-        public bool BoxDraw { get; set; } = true;
+        public bool BoxDraw { get; set; } = false;
 
+        [XmlAttribute]
         public float Scale { get; set; } = Game1.pixelZoom;
         public float HoverScale { get; set; } = Game1.pixelZoom + 0.22f;
         public float ScaleSpeed { get; set; } = 0.034f;
         public float m_trueScale { get; private set; }
 
-        /// <inheritdoc />
+        [XmlIgnore]
         public override int Width => BoxDraw ? (int)Size.X : TextureRect.Width * (int)Scale;
 
-        /// <inheritdoc />
+        [XmlIgnore]
         public override int Height => BoxDraw ? (int)Size.Y : TextureRect.Height * (int)Scale;
 
-        /// <inheritdoc />
-        public override string HoveredSound => "Cowboy_Footstep";
+        [XmlIgnore]
+        public override string HoveredSound { get; set; } = "Cowboy_Footstep";
 
         /*********
         ** Public methods

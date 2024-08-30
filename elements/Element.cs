@@ -31,13 +31,13 @@ namespace SMUI.Elements
         public Rectangle Bounds => new((int)Position.X, (int)Position.Y, Width, Height);
 
         public bool Hover { get; private set; }
-        public virtual string HoveredSound => string.Empty;
+        public virtual string HoveredSound { get; set; } = string.Empty;
         public virtual string Tooltip { get; set; } = string.Empty;
 
         public virtual bool Clickable { get; set; } = true;
         public bool ClickGestured { get; private set; }
         public bool Clicked => Hover && ClickGestured;
-        public virtual string ClickedSound => string.Empty;
+        public virtual string ClickedSound { get; set; } = string.Empty;
 
         //public abstract float DrawLayer { get; set; }
 
