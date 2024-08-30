@@ -116,7 +116,7 @@ namespace SMUI.Elements
             foreach (var row in Rows)
             {
                 int maxElementHeight = 0;
-                foreach (var element in row.Elements)
+                foreach (var element in row.Children)
                 {
                     element.LocalPosition = new Vector2(element.LocalPosition.X, topPx - Scrollbar.ScrollPercent * Rows.Count * RowHeight);
                     bool isChildOffScreen = isOffScreen || IsElementOffScreen(element);

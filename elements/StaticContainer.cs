@@ -6,9 +6,9 @@ namespace SMUI.Elements
 {
     public class StaticContainer : Container
     {
-        public Vector2 Size { get; set; }
+        public Vector2 Size;
 
-        public Color? OutlineColor { get; set; } = null;
+        public Color? OutlineColor = null;
 
         public override int Width => (int)Size.X;
 

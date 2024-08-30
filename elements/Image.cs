@@ -5,22 +5,23 @@ using StardewValley;
 
 namespace SMUI.Elements
 {
-    public class Image : Element, ISingleTexture
+    public class Image : Element
     {
         /*********
         ** Accessors
         *********/
         /// <summary>The image texture to display.</summary>
-        public Texture2D? Texture { get; set; }
+        public Texture2D? Texture;
 
         /// <summary>The pixel area within the texture to display, or <c>null</c> to show the entire image.</summary>
-        public Rectangle? TextureArea { get; set; }
+        public Rectangle? TextureArea;
+
+        public Color DrawColor = Color.White;
 
         /// <summary>The zoom factor to apply to the image.</summary>
-        public float Scale { get; set; } = Game1.pixelZoom;
+        public float Scale = Game1.pixelZoom;
 
         public override bool Clickable { get; set; } = false;
-        public Action<Image>? OnClick { get; set; }
 
         /// <inheritdoc />
         public override int Width => (int)GetActualSize().X;
@@ -29,9 +30,7 @@ namespace SMUI.Elements
         public override int Height => (int)GetActualSize().Y;
 
         /// <inheritdoc />
-        public override string HoveredSound => (Clickable) ? "shiny4" : string.Empty;
-
-        public Color DrawColor { get; set; } = Color.White;
+        public override string HoveredSound { get; set; } = "shiny4";
 
         public Image() { }
         public Image(Texture2D? texture, Rectangle? textureArea, float scale = Game1.pixelZoom)

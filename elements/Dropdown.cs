@@ -3,14 +3,13 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using SMUI.elements;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 
 namespace SMUI.Elements
 {
-    public class Dropdown : Element, ISingleTexture
+    public class Dropdown : Element
     {
         public int UserWidth { get; set; }
         public int MaxOptionsInDrop { get; set; } = 5;
@@ -30,7 +29,7 @@ namespace SMUI.Elements
         }
         public string Label => Choices[ActiveChoice].Label;
 
-        public int ActiveChoice { get; set; } = 0;
+        public int ActiveChoice = 0;
 
         public int ActivePosition { get; set; } = 0;
         public List<Option> Choices { get; set; } = new();
@@ -49,7 +48,7 @@ namespace SMUI.Elements
         public override int Height => 44;
 
         /// <inheritdoc />
-        public override string ClickedSound => "shwip";
+        public override string ClickedSound { get; set; } = "shwip";
 
         /// <inheritdoc />
         public override void Update(bool isOffScreen = false)

@@ -10,22 +10,22 @@ namespace SMUI.Elements
     public class Slider : Element
     {
         protected bool Dragging;
-        public int UserWidth { get; set; }
-        public override int Width => UserWidth;
-        public override int Height => 24;
+        public Vector2 Size = new(0, 24);
+        public override int Width => (int)Size.X;
+        public override int Height => (int)Size.Y;
 
-        public Action<Element>? Callback { get; set; }
+        public Action<Slider>? OnChange;
 
         public override void Draw(SpriteBatch b) { }
     }
 
     public class Slider<T> : Slider where T : struct
     {
-        public T Minimum { get; set; }
-        public T Maximum { get; set; }
-        public T Value { get; set; }
+        public T Minimum;
+        public T Maximum;
+        public T Value;
 
-        public T Interval { get; set; }
+        public T Interval;
 
         public override void Update(bool isOffScreen = false)
         {
@@ -64,7 +64,7 @@ namespace SMUI.Elements
                     _ => Value
                 };
 
-                Callback?.Invoke(this);
+                OnChange?.Invoke(this);
             }
         }
 

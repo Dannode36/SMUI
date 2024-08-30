@@ -40,7 +40,7 @@ namespace SMUI.Elements
             }
         }
 
-        public Action<Textbox>? Callback { get; set; }
+        public Action<Textbox>? OnChange;
 
         /// <inheritdoc />
         public override int Width => 192;
@@ -62,7 +62,7 @@ namespace SMUI.Elements
         {
             base.Update(isOffScreen);
 
-            if (ClickGestured && Callback != null)
+            if (ClickGestured && OnChange != null)
             {
                 Selected = Hover;
             }
@@ -131,7 +131,7 @@ namespace SMUI.Elements
             {
                 Game1.playSound("tinyWhip");
                 String = String[..^1];
-                Callback?.Invoke(this);
+                OnChange?.Invoke(this);
             }
         }
 
@@ -145,7 +145,7 @@ namespace SMUI.Elements
         protected virtual void ReceiveInput(string str)
         {
             String += str;
-            Callback?.Invoke(this);
+            OnChange?.Invoke(this);
         }
     }
 }

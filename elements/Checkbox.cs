@@ -6,16 +6,14 @@ using StardewValley.Menus;
 
 namespace SMUI.Elements
 {
-    public class Checkbox : Element, ISingleTexture
+    public class Checkbox : Element
     {
         /*********
         ** Accessors
         *********/
-        public Texture2D? Texture { get; set; }
-        public Rectangle CheckedTextureRect { get; set; }
-        public Rectangle UncheckedTextureRect { get; set; }
-
-        public Action<Element>? Callback { get; set; }
+        public Texture2D? Texture;
+        public Rectangle CheckedTextureRect;
+        public Rectangle UncheckedTextureRect;
 
         public bool Checked { get; set; } = true;
 
@@ -26,7 +24,7 @@ namespace SMUI.Elements
         public override int Height => UncheckedTextureRect.Height * 4;
 
         /// <inheritdoc />
-        public override string ClickedSound => "drumkit6";
+        public override string ClickedSound { get; set; } = "drumkit6";
 
         /*********
         ** Public methods
@@ -38,15 +36,21 @@ namespace SMUI.Elements
             UncheckedTextureRect = OptionsCheckbox.sourceRectUnchecked;
         }
 
+        public Checkbox(Texture2D tex, Rectangle checkedRect, Rectangle uncheckedRect)
+        {
+            Texture = tex;
+            CheckedTextureRect = checkedRect;
+            UncheckedTextureRect = uncheckedRect;
+        }
+
         /// <inheritdoc />
         public override void Update(bool isOffScreen = false)
         {
             base.Update(isOffScreen);
 
-            if (Clicked && Callback != null)
+            if (Clicked && OnClick != null)
             {
                 Checked = !Checked;
-                Callback.Invoke(this);
             }
         }
 

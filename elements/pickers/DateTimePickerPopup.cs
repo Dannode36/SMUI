@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SMUI.elements;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 
@@ -72,7 +71,7 @@ namespace SMUI.Elements.Pickers
             popUpButton = new(Game1.mouseCursors, new(384, 396, 15, 15))
             {
                 Size = buttonSize,
-                Callback = (e) =>
+                OnClick = (e) =>
                 { 
                     Open = !Open;
                     popUpBackground!.Enabled = Open;
@@ -95,7 +94,7 @@ namespace SMUI.Elements.Pickers
             closeButton = new(Game1.mouseCursors, new Rectangle(337, 494, 12, 12))
             {
                 Size = new(48, 48),
-                Callback = (e) =>
+                OnClick = (e) =>
                 {
                     Open = false;
                     popUpBackground!.Enabled = false;
@@ -121,7 +120,7 @@ namespace SMUI.Elements.Pickers
                 {
                     Size = new(DayButtonWidth, DayButtonWidth),
                     LocalPosition = buttonPos,
-                    Callback = (e) =>
+                    OnClick = (e) =>
                     {
                         Day = day;
                         UpdateHighlight();
@@ -163,7 +162,7 @@ namespace SMUI.Elements.Pickers
             intervalInput = new()
             {
                 Value = GhostInterval,
-                Callback = (e) =>
+                OnChange = (e) =>
                 {
                     GhostInterval = (e as Intbox)!.Value;
                 },
@@ -199,7 +198,7 @@ namespace SMUI.Elements.Pickers
         {
             daySelectors[Day - 1].IdleTint = Button.DefaultIdleTint; //Reset the previous day button colour
             daySelectors[Day - 1].HoverTint = Button.DefaultHoverTint;
-            daySelectorLabels[Day - 1].IdleTextColor = Game1.textColor; //Reset the previous day label colour
+            daySelectorLabels[Day - 1].Color = Game1.textColor; //Reset the previous day label colour
 
             if (GhostInterval > 0)
             {
@@ -207,7 +206,7 @@ namespace SMUI.Elements.Pickers
                 {
                     daySelectors[i].IdleTint = Button.DefaultIdleTint; //Reset the previous day button colour
                     daySelectors[i].HoverTint = Button.DefaultHoverTint;
-                    daySelectorLabels[i].IdleTextColor = Game1.textColor; //Reset the previous day label colour
+                    daySelectorLabels[i].Color = Game1.textColor; //Reset the previous day label colour
                 }
             }
 
@@ -219,14 +218,14 @@ namespace SMUI.Elements.Pickers
                     {
                         daySelectors[i].IdleTint = Color.PaleGreen; //Highlight the current day button
                         daySelectors[i].HoverTint = Color.LightGreen;
-                        daySelectorLabels[i].IdleTextColor = Color.WhiteSmoke; //Change label to white for better contrast
+                        daySelectorLabels[i].Color = Color.WhiteSmoke; //Change label to white for better contrast
                     }
                 }
             }
 
             daySelectors[Day - 1].IdleTint = Color.LightSeaGreen; //Highlight the current day button
             daySelectors[Day - 1].HoverTint = Color.SeaGreen;
-            daySelectorLabels[Day - 1].IdleTextColor = Color.White; //Change label to white for better contrast
+            daySelectorLabels[Day - 1].Color = Color.White; //Change label to white for better contrast
             OnChange?.Invoke(this);
         }
 

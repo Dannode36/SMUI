@@ -52,6 +52,8 @@ namespace SMUI.Elements
         public bool ClickConsumed = false;
         public Element? ClickConsumer = null;
 
+        public override bool Clickable { get; set; } = false;
+
         /*********
         ** Public methods
         *********/
@@ -87,7 +89,7 @@ namespace SMUI.Elements
                 {
                     ChildrenImpl[i].Update(isOffScreen);
 
-                    if (ChildrenImpl[i].Hover && string.IsNullOrEmpty(ChildrenImpl[i].Tooltip))
+                    if (ChildrenImpl[i].Hover && !string.IsNullOrEmpty(ChildrenImpl[i].Tooltip))
                     {
                         RenderLast = ChildrenImpl[i];
                     }

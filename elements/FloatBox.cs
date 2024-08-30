@@ -12,8 +12,6 @@ namespace SMUI.Elements
 
         public bool IsValid => float.TryParse(String, out _);
 
-        public float Interval { get; set; } = 1f;
-
         /// <inheritdoc />
         protected override void ReceiveInput(string str)
         {
@@ -34,7 +32,7 @@ namespace SMUI.Elements
                 return;
 
             String += str;
-            Callback?.Invoke(this);
+            OnChange?.Invoke(this);
         }
     }
 }

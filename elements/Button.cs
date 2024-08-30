@@ -8,38 +8,32 @@ using StardewValley.Menus;
 
 namespace SMUI.Elements
 {
-    public class Button : Element, ISingleTexture
+    public class Button : Element
     {
         public static Color DefaultIdleTint => Color.White;
         public static Color DefaultHoverTint => Color.Wheat;
 
         public Texture2D? Texture { get; set; }
-        public Rectangle TextureRect { get; set; } = Rectangle.Empty;
+        public Rectangle TextureRect = Rectangle.Empty;
 
-        public Color IdleTint { get; set; }
-        public Color HoverTint { get; set; }
-
-        public Action<Element>? Callback { get; set; }
+        public Color IdleTint;
+        public Color HoverTint;
 
         /// <summary>Size of button when using box draw</summary>
-        public Vector2 Size { get; set; }
+        public Vector2 Size;
 
         /// <summary>When true draws the texture to fit a box. When false draws the texture rect as is</summary>
-        public bool BoxDraw { get; set; } = false;
+        public bool BoxDraw = false;
 
-        [XmlAttribute]
-        public float Scale { get; set; } = Game1.pixelZoom;
-        public float HoverScale { get; set; } = Game1.pixelZoom + 0.22f;
-        public float ScaleSpeed { get; set; } = 0.034f;
+        public float Scale = Game1.pixelZoom;
+        public float HoverScale = Game1.pixelZoom + 0.22f;
+        public float ScaleSpeed = 0.034f;
         public float m_trueScale { get; private set; }
 
-        [XmlIgnore]
         public override int Width => BoxDraw ? (int)Size.X : TextureRect.Width * (int)Scale;
 
-        [XmlIgnore]
         public override int Height => BoxDraw ? (int)Size.Y : TextureRect.Height * (int)Scale;
 
-        [XmlIgnore]
         public override string HoveredSound { get; set; } = "Cowboy_Footstep";
 
         /*********
@@ -71,9 +65,6 @@ namespace SMUI.Elements
             base.Update(isOffScreen);
 
             m_trueScale = Hover ? Math.Min(m_trueScale + ScaleSpeed, HoverScale) : Math.Max(m_trueScale - ScaleSpeed, Scale);
-
-            if (Clicked)
-                Callback?.Invoke(this);
         }
 
         /// <inheritdoc />
@@ -84,7 +75,7 @@ namespace SMUI.Elements
 
             if (BoxDraw)
             {
-                IClickableMenu.drawTextureBox(b, Game1.mouseCursors, TextureRect, (int)Position.X, (int)Position.Y, Width, Height, Hover ? HoverTint : IdleTint, Scale, drawShadow: false);
+                IClickableMenu.drawTextureBox(b, Texture, TextureRect, (int)Position.X, (int)Position.Y, Width, Height, Hover ? HoverTint : IdleTint, Scale, drawShadow: false);
             }
             else
             {

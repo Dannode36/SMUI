@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Sickhead.Engine.Util;
 using SMUI.Elements;
+using SMUI.Elements.Pickers;
 using StardewModdingAPI;
 using StardewValley;
 using System;
@@ -8,36 +10,43 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using static StardewValley.Objects.BedFurniture;
 
 namespace SMUI
 {
-    public class Layout
-    {
-        public RootElement root = new();
-        public Dictionary<string, Element> uuidElements = new();
-    }
-
     public static class LayoutHelper
     {
         public static IModHelper helper;
         public static IMonitor monitor;
 
-        static private Dictionary<string, string> layoutNameToPath = new();
         public static List<Layout> Layouts = new();
+        static private Dictionary<string, string> layoutNameToPath = new();
 
-        //possibly some crap code here
-        private static string rootPath = string.Empty;
+        public static Dictionary<string, object> EventRegistry = new();
+
+        public static bool AddEventHandler(string name, Action<Element> handler)
+        {
+            return EventRegistry.TryAdd(name, handler);
+        }
+        public static void RemoveEventHandler(string name)
+        {
+            EventRegistry.Remove(name);
+        }
 
         public static void LoadLayout(string name)
         {
-            XDocument layoutDoc = XDocument.Load(layoutNameToPath[name]);
-            var tempRoot = Parse(layoutDoc);
-            if(tempRoot != null)
+            var stream = new StreamReader(File.OpenRead(helper.DirectoryPath + "\\" + name));
+            
+            XDocument xmlDoc = XDocument.Load(stream);
+            Layout layout = new();
+
+            if (layout.Parse(xmlDoc))
             {
-                Layouts.Add(tempRoot);
+                Layouts.Add(layout);
             }
             else
             {
@@ -45,46 +54,49 @@ namespace SMUI
             }
         }
 
-        public static Layout? Parse(XDocument xml)
+        public static Rectangle ToRect(this Vector4 vector)
         {
-            RootElement root = new();
+            return new((int)vector.X, (int)vector.Y, (int)vector.Z, (int)vector.W);
+        }
+    }
+
+    public class Layout
+    {
+        public string rootPath = string.Empty;
+        public RootElement root = new();
+        public Dictionary<string, Element> uuidElements = new();
+
+        public bool Parse(XDocument xml)
+        {
             if (xml.Root == null)
             {
-                return null;
+                return false;
             }
             foreach (var element in xml.Root.Elements())
             {
                 root.AddChild(ParseGenericElement(element));
             }
+            return true;
         }
 
-        private static Element ParseGenericElement(XElement xElement)
+        private Element ParseGenericElement(XElement xElement)
         {
             Element element = ParseElementTag(xElement);
 
-            var posAttr = xElement.Attribute("position");
-            if (posAttr != null)
+            element.UUID = xElement.Attribute("uuid")?.Value ?? element.UUID;
+            if (!string.IsNullOrEmpty(element.UUID))
             {
-                element.LocalPosition = ParseVector2(posAttr.Value);
+                uuidElements.Add(element.UUID, element);
             }
 
-            var hoverSoundAttr = xElement.Attribute("hoverSound");
-            if (hoverSoundAttr != null)
-            {
-                element.HoveredSound = hoverSoundAttr.Value;
-            }
+            TryVector2FromAttribute(xElement.Attribute("pos"), ref element.LocalPosition);
 
-            var clickSoundAttr = xElement.Attribute("clickSound");
-            if (clickSoundAttr != null)
-            {
-                element.ClickedSound = clickSoundAttr.Value;
-            }
+            element.HoveredSound = xElement.Attribute("hoverSound")?.Value ?? element.HoveredSound;
+            element.ClickedSound = xElement.Attribute("clickSound")?.Value ?? element.ClickedSound;
+            element.Tooltip = xElement.Attribute("tooltip")?.Value ?? element.Tooltip;
 
-            var tooltipAttr = xElement.Attribute("tooltip");
-            if (tooltipAttr != null)
-            {
-                element.Tooltip = tooltipAttr.Value;
-            }
+            TryBindEventHandler(xElement, "onClick", ref element.OnClick);
+            TryBindEventHandler(xElement, "onHover", ref element.OnHover);
 
             var enabledAttr = xElement.Attribute("enabled");
             if (enabledAttr != null)
@@ -92,115 +104,244 @@ namespace SMUI
                 element.Enabled = bool.Parse(enabledAttr.Value);
             }
 
+            var clickableAttr = xElement.Attribute("clickable");
+            if (clickableAttr != null)
+            {
+                element.Clickable = bool.Parse(clickableAttr.Value);
+            }
+
             return element;
         }
 
-        private static Element ParseElementTag(XElement xElement)
+        private Element ParseElementTag(XElement xElement)
         {
             switch (xElement.Name.LocalName)
             {
                 case "Button":
-                    var textureAttr = xElement.Attribute("texture");
-                    if(textureAttr == null)
-                    {
-                        monitor.Log("Button Tag did not specify a texture");
-                        return new Button();
-                    }
-
-                    var rectAttr = xElement.Attribute("rect");
-                    if (rectAttr == null)
-                    {
-                        monitor.Log("Button Tag did not specify a rect");
-                        return new Button();
-                    }
-                    Button button = new(GetBestTexture(textureAttr.Value), ParseVector4(rectAttr.Value).ToRect());
+                    var btn_textureAttr = xElement.Attribute("tex");
+                    var btn_rectAttr = xElement.Attribute("texRect") ?? throw new("Button tag did not specify a rect");
+                    Button button = new(GetBestTexture(btn_textureAttr.Value ?? "mouseCursors"), ParseVector4(btn_rectAttr.Value).ToRect());
 
                     //OPTIONALS
-                    var boxDrawAttr = xElement.Attribute("boxDraw");
-                    if (boxDrawAttr != null)
-                    {
-                        button.BoxDraw = bool.Parse(boxDrawAttr.Value);
-                    }
-
-                    var idleTintAttr = xElement.Attribute("idleTint");
-                    if (idleTintAttr != null)
-                    {
-                        button.IdleTint = new(ParseVector4(idleTintAttr.Value));
-                    }
-
-                    var hoverTintAttr = xElement.Attribute("hoverTint");
-                    if (hoverTintAttr != null)
-                    {
-                        button.HoverTint = new(ParseVector4(hoverTintAttr.Value));
-                    }
-
-                    var sizeAttr = xElement.Attribute("size");
-                    if (sizeAttr != null)
-                    {
-                        button.Size = ParseVector2(sizeAttr.Value);
-                    }
-
+                    TryFloatFromAttribute(xElement.Attribute("scale"), ref button.Scale);
+                    TryFloatFromAttribute(xElement.Attribute("hoverScale"), ref button.HoverScale);
+                    TryFloatFromAttribute(xElement.Attribute("scaleSpeed"), ref button.ScaleSpeed);
+                    TryBoolFromAttribute(xElement.Attribute("boxDraw"), ref button.BoxDraw);
+                    TryColorFromAttribute(xElement.Attribute("idleTint"), ref button.IdleTint);
+                    TryColorFromAttribute(xElement.Attribute("hoverTint"), ref button.HoverTint);
+                    TryVector2FromAttribute(xElement.Attribute("size"), ref button.Size);
                     return button;
                 case "Checkbox":
-                    break;
+                    Checkbox checkbox = new();
+
+                    var cbx_textureAttr = xElement.Attribute("tex");
+                    if (cbx_textureAttr != null)
+                    {
+                        checkbox.Texture = GetBestTexture(cbx_textureAttr.Value);
+                    }
+                    TryRectFromAttribute(xElement.Attribute("checkedRect"), ref checkbox.CheckedTextureRect);
+                    TryRectFromAttribute(xElement.Attribute("uncheckedRect"), ref checkbox.UncheckedTextureRect);
+
+                    return checkbox;
                 case "Dropdown":
-                    break;
+                    Dropdown dropdown = new();
+                    foreach (var child in xElement.Elements())
+                    {
+                        if (child.Name == nameof(Option))
+                        {
+                            dropdown.Choices.Add(ParseOption(child));
+                        }
+                        else
+                        {
+                            throw new("Child of Dropdown was not an Option tag");
+                        }
+                    }
+
+                    TryIntFromAttribute(xElement.Attribute("choice"), ref dropdown.ActiveChoice);
+                    TryBindEventHandler(xElement, "onChange", ref dropdown.OnChange);
+                    return dropdown;
                 case "FloatBox":
-                    break;
+                    Floatbox floatbox = new();
+                    if(float.TryParse(xElement.Value, out float floatValue))
+                    {
+                        floatbox.Value = floatValue;
+                    }
+                    return floatbox;
                 case "Image":
-                    break;
+                    Image image = new();
+
+                    var image_textureAttr = xElement.Attribute("tex");
+                    if (image_textureAttr != null)
+                    {
+                        image.Texture = GetBestTexture(image_textureAttr.Value);
+                    }
+                    TryRectFromAttribute(xElement.Attribute("texRect"), ref image.TextureArea);
+                    TryFloatFromAttribute(xElement.Attribute("scale"), ref image.Scale);
+                    TryColorFromAttribute(xElement.Attribute("color"), ref image.DrawColor);
+                    return image;
                 case "IntBox":
-                    break;
+                    Intbox intbox = new();
+                    if (int.TryParse(xElement.Value, out int intValue))
+                    {
+                        intbox.Value = intValue;
+                    }
+                    return intbox;
                 case "ItemSlot":
-                    break;
+                    return new ItemSlot(); //Unsupported as of yet
                 case "ItemWithBorder":
-                    break;
+                    return new ItemWithBorder(); //Unsupported as of yet
                 case "Label":
-                    break;
-                case "Option":
-                    break;
+                    Label label = new()
+                    {
+                        String = xElement.Value,
+                        Font = GetBestFont("SmallFont")
+                    };
+                    TryBoolFromAttribute(xElement.Attribute("bold"), ref label.Bold);
+                    TryBoolFromAttribute(xElement.Attribute("shadow"), ref label.NonBoldShadow);
+                    TryFloatFromAttribute(xElement.Attribute("scale"), ref label.NonBoldScale);
+                    TryColorFromAttribute(xElement.Attribute("color"), ref label.Color);
+                    return label;
                 case "Row":
-                    break;
-                case "Scrollbar":
-                    break;
-                case "Slider":
-                    break;
-                case "StaticContainer":
-                    StaticContainer staticContainer = new();
+                    Row row = new();
+
                     foreach (var element in xElement.Elements())
                     {
-                        staticContainer.AddChild(ParseElementTag(element));
+                        row.AddChild(ParseGenericElement(element));
+                    }
+                    return row;
+                case "Scrollbar":
+                    return new Scrollbar(); //Unsupported as of yet
+                case "Slider":
+                    Slider<float> slider = new();
+                    TryVector2FromAttribute(xElement.Attribute("size"), ref slider.Size);
+                    TryBindEventHandler(xElement, "onChange", ref slider.OnChange);
+
+                    TryFloatFromAttribute(xElement.Attribute("min"), ref slider.Minimum);
+                    TryFloatFromAttribute(xElement.Attribute("max"), ref slider.Maximum);
+                    TryFloatFromAttribute(xElement.Attribute("value"), ref slider.Value);
+                    TryFloatFromAttribute(xElement.Attribute("interval"), ref slider.Interval);
+
+                    return slider;
+                case "StaticContainer":
+                    StaticContainer staticContainer = new();
+
+                    TryColorFromAttribute(xElement.Attribute("outlineColor"), ref staticContainer.OutlineColor);
+                    TryVector2FromAttribute(xElement.Attribute("size"), ref staticContainer.Size);
+
+                    foreach (var element in xElement.Elements())
+                    {
+                        staticContainer.AddChild(ParseGenericElement(element));
                     }
                     return staticContainer;
                 case "Table":
-                    break;
+                    Table table = new();
+
+                    foreach (var tableChild in xElement.Elements())
+                    {
+                        if(tableChild.Name == "Row")
+                        {
+                            Row rowElement = new();
+
+                            foreach (var element in tableChild.Elements())
+                            {
+                                rowElement.AddChild(ParseGenericElement(element));
+                            }
+
+                            table.AddChild(rowElement);
+                        }
+                        else
+                        {
+                            Row rowElement = new( new[]{ ParseGenericElement(tableChild) });
+                            table.AddChild(rowElement);
+                        }
+                    }
+                    return table;
                 case "Textbox":
-                    break;
+                    Textbox textbox = new()
+                    {
+                        String = xElement.Value
+                    };
+                    TryBindEventHandler(xElement, "onChange", ref textbox.OnChange);
+                    return textbox;
                 case "DateTimePicker":
-                    break;
+                    return new DateTimePicker();
                 case "DateTimePickerPopup":
-                    break;
+                    return new DateTimePickerPopup();
                 default:
-                    monitor.Log("Invalid element tag");
-                    throw new();
+                    throw new("Invalid element tag");
             }
         }
 
-        private static Texture2D? GetBestTexture(string name)
+        private static Option ParseOption(XElement xElement)
         {
-            var game1Prop = (Texture2D?)typeof(Game1).GetProperty(name)?.GetValue(null);
-            if (game1Prop != null)
+            var valueAttr = xElement.Attribute("value");
+            if (valueAttr != null)
             {
-                return game1Prop;
+                if (string.IsNullOrWhiteSpace(xElement.Value))
+                {
+                    return new(valueAttr.Value);
+                }
+                return new Option(xElement.Value, valueAttr.Value);
             }
 
-            var modTexture = helper.ModContent.Load<Texture2D>(rootPath + "/" + name);
+            return new Option();
+        }
+        private Texture2D? GetBestTexture(string name)
+        {
+            var game1Type = typeof(Game1);
+            var game1Prop = game1Type.GetMember(name);
+            if (game1Prop != null)
+            {
+                var gameTex = (Texture2D?)(game1Prop?.FirstOrDefault()?.GetValue(null));
+
+                if(gameTex != null)
+                {
+                    return gameTex;
+                }
+            }
+
+            var gameContentTex = LayoutHelper.helper.GameContent.Load<Texture2D>("LooseSprites\\" + name);
+            if(gameContentTex != null)
+            {
+                return gameContentTex;
+            }
+
+            var modTexture = LayoutHelper.helper.ModContent.Load<Texture2D>(rootPath + "/" + name);
             if (modTexture != null)
             {
                 return modTexture;
             }
 
-            monitor.Log($"No texture with the name \"{name}\" could be found", LogLevel.Error);
+            LayoutHelper.monitor.Log($"No texture with the name \"{name}\" could be found", LogLevel.Error);
+            return null;
+        }
+        private SpriteFont? GetBestFont(string name)
+        {
+            var game1Type = typeof(Game1);
+            var game1Prop = game1Type.GetMember(name);
+            if (game1Prop != null)
+            {
+                var gameFont = (SpriteFont?)(game1Prop?.FirstOrDefault()?.GetValue(null));
+
+                if(gameFont != null)
+                {
+                    return gameFont;
+                }
+            }
+
+            var gameContentFont = LayoutHelper.helper.GameContent.Load<SpriteFont>("Fonts\\" + name);
+            if(gameContentFont != null)
+            {
+                return gameContentFont;
+            }
+
+            var modFont = LayoutHelper.helper.ModContent.Load<SpriteFont>(rootPath + "/" + name);
+            if (modFont != null)
+            {
+                return modFont;
+            }
+
+            LayoutHelper.monitor.Log($"No texture with the name \"{name}\" could be found", LogLevel.Error);
             return null;
         }
 
@@ -210,7 +351,7 @@ namespace SMUI
 
             if (values.Length < 2)
             {
-                monitor.Log("Invalid rectangle attribute", LogLevel.Error);
+                LayoutHelper.monitor.Log("Invalid rectangle attribute", LogLevel.Error);
                 return Vector2.Zero;
             }
 
@@ -222,7 +363,7 @@ namespace SMUI
 
             if (values.Length < 3)
             {
-                monitor.Log("Invalid rectangle attribute", LogLevel.Error);
+                LayoutHelper.monitor.Log("Invalid rectangle attribute", LogLevel.Error);
                 return Vector3.Zero;
             }
 
@@ -232,17 +373,113 @@ namespace SMUI
         {
             float[] values = Array.ConvertAll(definition.Split(','), s => float.Parse(s));
 
-            if(values.Length < 4)
+            if (values.Length < 4)
             {
-                monitor.Log("Invalid rectangle attribute", LogLevel.Error);
+                LayoutHelper.monitor.Log("Invalid rectangle attribute", LogLevel.Error);
                 return Vector4.Zero;
             }
 
             return new(values[0], values[1], values[2], values[3]);
         }
-        private static Rectangle ToRect(this Vector4 vector)
+
+        private static bool TryBindEventHandler<T>(XElement xElement, string name, ref Action<T>? handler)
         {
-            return new((int)vector.X, (int)vector.Y, (int)vector.Z, (int)vector.W);
+            var handlerAttr = xElement.Attribute(name);
+            if (handlerAttr != null)
+            {
+                if (LayoutHelper.EventRegistry.TryGetValue(handlerAttr.Value, out var clickAction))
+                {
+                    handler = (Action<T>?)clickAction;
+                    return true;
+                }
+                else
+                {
+                    LayoutHelper.monitor.Log($"No event handler named, \"{handlerAttr.Value}\" is registered. " +
+                        $"Either register a handler under that name and call parse again or bind one manually", LogLevel.Error);
+                }
+            }
+            return false;
+        }
+        private static bool TryIntFromAttribute(XAttribute? attribute, ref int value)
+        {
+            if (attribute != null)
+            {
+                value = int.Parse(attribute.Value);
+                return true;
+            }
+            return false;
+        }
+        private static bool TryFloatFromAttribute(XAttribute? attribute, ref float value)
+        {
+            if (attribute != null)
+            {
+                value = float.Parse(attribute.Value);
+                return true;
+            }
+            return false;
+        }
+        private static bool TryBoolFromAttribute(XAttribute? attribute, ref bool value)
+        {
+            if (attribute != null)
+            {
+                value = bool.Parse(attribute.Value);
+                return true;
+            }
+            return false;
+        }
+        private static bool TryVector2FromAttribute(XAttribute? attribute, ref Vector2 value)
+        {
+            if (attribute != null)
+            {
+                value = ParseVector2(attribute.Value);
+                return true;
+            }
+            return false;
+        }
+        private static bool TryVector4FromAttribute(XAttribute? attribute, ref Vector4 value)
+        {
+            if (attribute != null)
+            {
+                value = ParseVector4(attribute.Value);
+                return true;
+            }
+            return false;
+        }
+        private static bool TryColorFromAttribute(XAttribute? attribute, ref Color value)
+        {
+            if (attribute != null)
+            {
+                value = new(ParseVector4(attribute.Value));
+                return true;
+            }
+            return false;
+        }
+        private static bool TryColorFromAttribute(XAttribute? attribute, ref Color? value)
+        {
+            if (attribute != null)
+            {
+                value = new(ParseVector4(attribute.Value));
+                return true;
+            }
+            return false;
+        }
+        private static bool TryRectFromAttribute(XAttribute? attribute, ref Rectangle value)
+        {
+            if (attribute != null)
+            {
+                value = ParseVector4(attribute.Value).ToRect();
+                return true;
+            }
+            return false;
+        }
+        private static bool TryRectFromAttribute(XAttribute? attribute, ref Rectangle? value)
+        {
+            if (attribute != null)
+            {
+                value = ParseVector4(attribute.Value).ToRect();
+                return true;
+            }
+            return false;
         }
     }
 }

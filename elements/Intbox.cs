@@ -29,7 +29,7 @@ namespace SMUI.Elements
                 return;
 
             String += str;
-            Callback?.Invoke(this);
+            OnChange?.Invoke(this);
         }
     }
 }

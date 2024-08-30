@@ -11,19 +11,16 @@ namespace SMUI.Elements
         /*********
         ** Accessors
         *********/
-        public bool Bold { get; set; } = false;
-        public float NonBoldScale { get; set; } = 1f; // Only applies when Bold = false
-        public bool NonBoldShadow { get; set; } = true; // Only applies when Bold = false
-        public Color IdleTextColor { get; set; } = Game1.textColor;
-        public Color HoverTextColor { get; set; } = Game1.unselectedOptionColor;
+        public bool Bold = false;
+        public float NonBoldScale = 1f; // Only applies when Bold = false
+        public bool NonBoldShadow = true; // Only applies when Bold = false
+        public Color Color = Game1.textColor;
 
-        public SpriteFont Font { get; set; } = Game1.dialogueFont; // Only applies when Bold = false
+        public SpriteFont Font = Game1.dialogueFont; // Only applies when Bold = false
 
         public float Scale => Bold ? 1f : NonBoldScale;
 
-        public string String { get; set; } = string.Empty;
-
-        public Action<Label>? OnClick { get; set; }
+        public string String = string.Empty;
 
         /// <inheritdoc />
         public override int Width => (int)Measure().X;
@@ -32,11 +29,11 @@ namespace SMUI.Elements
         public override int Height => (int)Measure().Y;
 
         /// <inheritdoc />
-        public override string HoveredSound => (OnClick != null) ? "shiny4" : string.Empty;
+        public override string HoveredSound { get; set; } = "shiny4";
         public override bool Clickable { get; set; } = false;
 
         public Label() { }
-        public Label(string str, float scale, bool bold, SpriteFont? font = null)
+        public Label(string str, float scale, bool bold = false, SpriteFont? font = null)
         {
             String = str;
             NonBoldScale = scale;
@@ -75,14 +72,13 @@ namespace SMUI.Elements
             }
             else
             {
-                Color col = altColor ? HoverTextColor : IdleTextColor;
-                if (col.A <= 0)
+                if (Color.A <= 0)
                     return;
 
                 if (NonBoldShadow)
-                    Utility.drawTextWithShadow(b, String, Font, Position, col, NonBoldScale);
+                    Utility.drawTextWithShadow(b, String, Font, Position, Color, NonBoldScale);
                 else
-                    b.DrawString(Font, String, Position, col, 0f, Vector2.Zero, NonBoldScale, SpriteEffects.None, 1);
+                    b.DrawString(Font, String, Position, Color, 0f, Vector2.Zero, NonBoldScale, SpriteEffects.None, 1);
             }
         }
 

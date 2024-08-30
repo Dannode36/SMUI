@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewValley;
+using static StardewValley.LocationRequest;
 
 namespace SMUI.Elements
 {
@@ -13,9 +14,10 @@ namespace SMUI.Elements
         ** Accessors
         *********/
         public object? UserData { get; set; }
+        public string UUID { get; set; } = string.Empty;
 
         public Container? Parent { get; internal set; }
-        public Vector2 LocalPosition { get; set; }
+        public Vector2 LocalPosition;
         public Vector2 Position
         {
             get
@@ -25,6 +27,9 @@ namespace SMUI.Elements
                 return LocalPosition;
             }
         }
+
+        public Action<Element>? OnClick;
+        public Action<Element>? OnHover;
 
         public abstract int Width { get; }
         public abstract int Height { get; }
@@ -76,8 +81,14 @@ namespace SMUI.Elements
             }
 
             bool newHover = !hidden && !GetRoot().Obscured && Bounds.Contains(mouseX, mouseY);
-            if (newHover && !Hover && HoveredSound != string.Empty)
-                Game1.playSound(HoveredSound);
+            if (newHover && !Hover)
+            {
+                if(HoveredSound != string.Empty)
+                {
+                    Game1.playSound(HoveredSound);
+                }
+                OnHover?.Invoke(this);
+            }
             Hover = newHover;
 
             if(Clickable && Parent != null && !Parent.ClickConsumed)
@@ -94,10 +105,13 @@ namespace SMUI.Elements
                     {
                         ClickGestured = false;
                     }
-                }
 
-                if (Clicked && ClickedSound != string.Empty)
-                    Game1.playSound(ClickedSound);
+                    if (ClickedSound != string.Empty)
+                    {
+                        Game1.playSound(ClickedSound);
+                    }
+                    OnClick?.Invoke(this);
+                }
             }
             else //Cover any edge cases
             {
