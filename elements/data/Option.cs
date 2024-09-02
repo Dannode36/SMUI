@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SMUI.Elements
+namespace SMUI.Elements.Data
 {
     public record struct Option
     {

@@ -16,6 +16,11 @@ namespace SMUI.Elements
         /*********
         ** Public methods
         *********/
+        public RootElement()
+        {
+            ModEntry.AddToUpdateList(this);
+        }
+
         /// <inheritdoc />
         public override void Update(bool isOffScreen = false)
         {

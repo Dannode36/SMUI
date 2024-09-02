@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SMUI.Elements.Data;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
@@ -11,7 +12,7 @@ namespace SMUI.Elements
 {
     public class Dropdown : Element
     {
-        public int UserWidth { get; set; }
+        public int DesiredWidth { get; set; }
         public int MaxOptionsInDrop { get; set; } = 5;
         public Texture2D? Texture { get; set; } = Game1.mouseCursors;
         public Rectangle BackgroundTextureRect { get; set; } = OptionsDropDown.dropDownBGSource;
@@ -42,7 +43,7 @@ namespace SMUI.Elements
         public static int SinceDropdownWasActive = 0;
 
         /// <inheritdoc />
-        public override int Width => Math.Max(300, Math.Min(500, UserWidth));
+        public override int Width => Math.Max(300, Math.Min(500, DesiredWidth));
 
         /// <inheritdoc />
         public override int Height => 44;

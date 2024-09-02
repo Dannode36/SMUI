@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Sickhead.Engine.Util;
+using SMUI.Elements.Data;
 using SMUI.Elements;
 using SMUI.Elements.Pickers;
 using StardewModdingAPI;
@@ -16,7 +17,7 @@ using System.Xml;
 using System.Xml.Linq;
 using static StardewValley.Objects.BedFurniture;
 
-namespace SMUI
+namespace SMUI.Layout
 {
     public static class LayoutHelper
     {
@@ -37,11 +38,11 @@ namespace SMUI
             EventRegistry.Remove(name);
         }
 
-        public static void LoadLayout(string name)
+        public static Layout LoadLayout(string name)
         {
             var stream = new StreamReader(File.OpenRead(helper.DirectoryPath + "\\" + name));
             
-            XDocument xmlDoc = XDocument.Load(stream);
+            XDocument xmlDoc = XDocument.Load(stream, LoadOptions.SetLineInfo);
             Layout layout = new();
 
             if (layout.Parse(xmlDoc))
@@ -52,11 +53,17 @@ namespace SMUI
             {
                 monitor.Log("Invalid XML layout", LogLevel.Error);
             }
+            return layout;
         }
 
         public static Rectangle ToRect(this Vector4 vector)
         {
             return new((int)vector.X, (int)vector.Y, (int)vector.Z, (int)vector.W);
+        }
+
+        public static int GetElementLine(XElement xElement)
+        {
+            return ((IXmlLineInfo)xElement).HasLineInfo() ? ((IXmlLineInfo)xElement).LineNumber : -1;
         }
     }
 
@@ -66,25 +73,37 @@ namespace SMUI
         public RootElement root = new();
         public Dictionary<string, Element> uuidElements = new();
 
-
+        private const string attr_OnClick = "onClick";
+        private const string attr_OnHover = "onHover";
+        private const string attr_OnChange = "onChange";
         private const string attr_UUID = "uuid";
         private const string attr_Postion = "pos";
         private const string attr_HoverSound = "hoverSound";
         private const string attr_ClickSound = "clickSound";
         private const string attr_Tooltip = "tooltip";
-        private const string attr_OnClick = "onClick";
-        private const string attr_OnHover = "onHover";
         private const string attr_Enabled = "enabled";
         private const string attr_Clickable = "clickable";
         private const string attr_Texture = "tex";
         private const string attr_TextureRect = "texRect";
+        private const string attr_CheckedTextureRect = "checkedTexRect";
+        private const string attr_UncheckedTextureRect = "uncheckedTexRect";
         private const string attr_Size = "size";
         private const string attr_Scale = "scale";
         private const string attr_HoverScale = "hoverScale";
         private const string attr_ScaleSpeed = "scaleSpeed";
         private const string attr_BoxDraw = "boxDraw";
+        private const string attr_Tint = "tint";
         private const string attr_IdleTint = "idleTint";
         private const string attr_HoverTint = "hoverTint";
+        private const string attr_OutlineColor = "shadow";
+        private const string attr_SelectedChoice = "choice";
+        private const string attr_Font = "font";
+        private const string attr_Bold = "bold";
+        private const string attr_Shadow = "shadow";
+        private const string attr_Value = "shadow";
+        private const string attr_Min = "shadow";
+        private const string attr_Max = "shadow";
+        private const string attr_Interval = "shadow";
 
         public bool Parse(XDocument xml)
         {
@@ -98,7 +117,6 @@ namespace SMUI
             }
             return true;
         }
-
         private Element ParseGenericElement(XElement xElement)
         {
             Element element = ParseElementTag(xElement);
@@ -132,14 +150,13 @@ namespace SMUI
 
             return element;
         }
-
         private Element ParseElementTag(XElement xElement)
         {
             switch (xElement.Name.LocalName)
             {
                 case nameof(Button):
                     var btn_textureAttr = xElement.Attribute(attr_Texture);
-                    var btn_rectAttr = xElement.Attribute(attr_TextureRect) ?? throw new("Button tag did not specify a rect");
+                    var btn_rectAttr = xElement.Attribute(attr_TextureRect) ?? throw new($"Button tag (line {LayoutHelper.GetElementLine(xElement)}) did not specify a rect");
                     Button button = new(GetBestTexture(btn_textureAttr.Value ?? "mouseCursors"), ParseVector4(btn_rectAttr.Value).ToRect());
 
                     //OPTIONALS
@@ -154,13 +171,13 @@ namespace SMUI
                 case nameof(Checkbox):
                     Checkbox checkbox = new();
 
-                    var cbx_textureAttr = xElement.Attribute("tex");
+                    var cbx_textureAttr = xElement.Attribute(attr_Texture);
                     if (cbx_textureAttr != null)
                     {
                         checkbox.Texture = GetBestTexture(cbx_textureAttr.Value);
                     }
-                    TryRectFromAttribute(xElement.Attribute("checkedRect"), ref checkbox.CheckedTextureRect);
-                    TryRectFromAttribute(xElement.Attribute("uncheckedRect"), ref checkbox.UncheckedTextureRect);
+                    TryRectFromAttribute(xElement.Attribute(attr_CheckedTextureRect), ref checkbox.CheckedTextureRect);
+                    TryRectFromAttribute(xElement.Attribute(attr_UncheckedTextureRect), ref checkbox.UncheckedTextureRect);
 
                     return checkbox;
                 case nameof(Dropdown):
@@ -173,12 +190,12 @@ namespace SMUI
                         }
                         else
                         {
-                            throw new("Child of Dropdown was not an Option tag");
+                            throw new($"Child of Dropdown (line {LayoutHelper.GetElementLine(xElement)}) was not an Option tag");
                         }
                     }
 
-                    TryIntFromAttribute(xElement.Attribute("choice"), ref dropdown.ActiveChoice);
-                    TryBindEventHandler(xElement, "onChange", ref dropdown.OnChange);
+                    TryIntFromAttribute(xElement.Attribute(attr_SelectedChoice), ref dropdown.ActiveChoice);
+                    TryBindEventHandler(xElement, attr_OnChange, ref dropdown.OnChange);
                     return dropdown;
                 case nameof(Floatbox):
                     Floatbox floatbox = new();
@@ -190,14 +207,14 @@ namespace SMUI
                 case nameof(Image):
                     Image image = new();
 
-                    var image_textureAttr = xElement.Attribute("tex");
+                    var image_textureAttr = xElement.Attribute(attr_Texture);
                     if (image_textureAttr != null)
                     {
                         image.Texture = GetBestTexture(image_textureAttr.Value);
                     }
-                    TryRectFromAttribute(xElement.Attribute("texRect"), ref image.TextureArea);
-                    TryFloatFromAttribute(xElement.Attribute("scale"), ref image.Scale);
-                    TryColorFromAttribute(xElement.Attribute("color"), ref image.DrawColor);
+                    TryRectFromAttribute(xElement.Attribute(attr_TextureRect), ref image.TextureArea);
+                    TryFloatFromAttribute(xElement.Attribute(attr_Scale), ref image.Scale);
+                    TryColorFromAttribute(xElement.Attribute(attr_Tint), ref image.DrawColor);
                     return image;
                 case nameof(Intbox):
                     Intbox intbox = new();
@@ -207,19 +224,20 @@ namespace SMUI
                     }
                     return intbox;
                 case nameof(ItemSlot):
-                    return new ItemSlot(); //Unsupported as of yet
+                    return new ItemSlot(); //Unsupported
                 case nameof(ItemWithBorder):
-                    return new ItemWithBorder(); //Unsupported as of yet
+                    return new ItemWithBorder(); //Unsupported
                 case nameof(Label):
                     Label label = new()
                     {
                         String = xElement.Value,
-                        Font = GetBestFont("SmallFont")
+                        Font = GetBestFont(xElement.Attribute(attr_Font)?.Value ?? "SmallFont")
                     };
-                    TryBoolFromAttribute(xElement.Attribute("bold"), ref label.Bold);
-                    TryBoolFromAttribute(xElement.Attribute("shadow"), ref label.NonBoldShadow);
-                    TryFloatFromAttribute(xElement.Attribute("scale"), ref label.NonBoldScale);
-                    TryColorFromAttribute(xElement.Attribute("color"), ref label.Color);
+
+                    TryBoolFromAttribute(xElement.Attribute(attr_Bold), ref label.Bold);
+                    TryBoolFromAttribute(xElement.Attribute(attr_Shadow), ref label.NonBoldShadow);
+                    TryFloatFromAttribute(xElement.Attribute(attr_Scale), ref label.NonBoldScale);
+                    TryColorFromAttribute(xElement.Attribute(attr_Tint), ref label.Color);
                     return label;
                 case nameof(Row):
                     Row row = new();
@@ -233,20 +251,20 @@ namespace SMUI
                     return new Scrollbar(); //Unsupported as of yet
                 case nameof(Slider):
                     Slider<float> slider = new();
-                    TryVector2FromAttribute(xElement.Attribute("size"), ref slider.Size);
-                    TryBindEventHandler(xElement, "onChange", ref slider.OnChange);
+                    TryVector2FromAttribute(xElement.Attribute(attr_Size), ref slider.Size);
+                    TryBindEventHandler(xElement, attr_OnChange, ref slider.OnChange);
 
-                    TryFloatFromAttribute(xElement.Attribute("min"), ref slider.Minimum);
-                    TryFloatFromAttribute(xElement.Attribute("max"), ref slider.Maximum);
-                    TryFloatFromAttribute(xElement.Attribute("value"), ref slider.Value);
-                    TryFloatFromAttribute(xElement.Attribute("interval"), ref slider.Interval);
+                    TryFloatFromAttribute(xElement.Attribute(attr_Min), ref slider.Minimum);
+                    TryFloatFromAttribute(xElement.Attribute(attr_Max), ref slider.Maximum);
+                    TryFloatFromAttribute(xElement.Attribute(attr_Value), ref slider.Value);
+                    TryFloatFromAttribute(xElement.Attribute(attr_Interval), ref slider.Interval);
 
                     return slider;
                 case nameof(StaticContainer):
                     StaticContainer staticContainer = new();
 
-                    TryColorFromAttribute(xElement.Attribute("outlineColor"), ref staticContainer.OutlineColor);
-                    TryVector2FromAttribute(xElement.Attribute("size"), ref staticContainer.Size);
+                    TryColorFromAttribute(xElement.Attribute(attr_OutlineColor), ref staticContainer.OutlineColor);
+                    TryVector2FromAttribute(xElement.Attribute(attr_Size), ref staticContainer.Size);
 
                     foreach (var element in xElement.Elements())
                     {
@@ -258,7 +276,7 @@ namespace SMUI
 
                     foreach (var tableChild in xElement.Elements())
                     {
-                        if(tableChild.Name == "Row")
+                        if(tableChild.Name == nameof(Row))
                         {
                             Row rowElement = new();
 
@@ -271,7 +289,7 @@ namespace SMUI
                         }
                         else
                         {
-                            Row rowElement = new( new[]{ ParseGenericElement(tableChild) });
+                            Row rowElement = new(new[] { ParseGenericElement(tableChild) });
                             table.AddChild(rowElement);
                         }
                     }
@@ -281,20 +299,20 @@ namespace SMUI
                     {
                         String = xElement.Value
                     };
-                    TryBindEventHandler(xElement, "onChange", ref textbox.OnChange);
+                    TryBindEventHandler(xElement, attr_OnChange, ref textbox.OnChange);
                     return textbox;
-                case "DateTimePicker":
+                case nameof(DateTimePicker):
                     return new DateTimePicker();
-                case "DateTimePickerPopup":
+                case nameof(DateTimePickerPopup):
                     return new DateTimePickerPopup();
                 default:
-                    throw new("Invalid element tag");
+                    throw new($"Invalid element tag (line {LayoutHelper.GetElementLine(xElement)})");
             }
         }
 
         private static Option ParseOption(XElement xElement)
         {
-            var valueAttr = xElement.Attribute("value");
+            var valueAttr = xElement.Attribute(attr_Value);
             if (valueAttr != null)
             {
                 if (string.IsNullOrWhiteSpace(xElement.Value))
@@ -361,7 +379,7 @@ namespace SMUI
                 return modFont;
             }
 
-            LayoutHelper.monitor.Log($"No texture with the name \"{name}\" could be found", LogLevel.Error);
+            LayoutHelper.monitor.Log($"No font with the name \"{name}\" could be found", LogLevel.Error);
             return null;
         }
 

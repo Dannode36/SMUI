@@ -18,10 +18,10 @@ namespace SMUI.Elements
         public bool Checked { get; set; } = true;
 
         /// <inheritdoc />
-        public override int Width => UncheckedTextureRect.Width * 4;
+        public override int Width => UncheckedTextureRect.Width * Game1.pixelZoom;
 
         /// <inheritdoc />
-        public override int Height => UncheckedTextureRect.Height * 4;
+        public override int Height => UncheckedTextureRect.Height * Game1.pixelZoom;
 
         /// <inheritdoc />
         public override string ClickedSound { get; set; } = "drumkit6";
@@ -48,6 +48,7 @@ namespace SMUI.Elements
         {
             base.Update(isOffScreen);
 
+            //Unsure if this null check is actually helpful or just annoying
             if (Clicked && OnClick != null)
             {
                 Checked = !Checked;
@@ -60,7 +61,7 @@ namespace SMUI.Elements
             if (IsHidden())
                 return;
 
-            b.Draw(Texture, Position, Checked ? CheckedTextureRect : UncheckedTextureRect, Color.White, 0, Vector2.Zero, 4, SpriteEffects.None, 0);
+            b.Draw(Texture, Position, Checked ? CheckedTextureRect : UncheckedTextureRect, Color.White, 0, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 0);
             Game1.activeClickableMenu?.drawMouse(b);
         }
     }

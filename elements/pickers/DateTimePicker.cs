@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SMUI.Elements.Data;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 using System.ComponentModel;
