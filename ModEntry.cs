@@ -5,7 +5,6 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
-using StardewValley.Menus;
 using SMUI.Layout;
 using SMUI.Elements;
 
