@@ -8,7 +8,7 @@
     <Title>SMUI</Title>
     <Authors>Dannode36</Authors>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-	<Version>0.1.0</Version>
+	<Version>0.2.0</Version>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
 	<RepositoryUrl>https://github.com/Dannode36/SMUI</RepositoryUrl>
 	<PackageTags>SMAPI;SDV;UI;Stardew Valley;Mod;Framework</PackageTags>
@@ -34,11 +34,14 @@
 
   <ItemGroup>
     <None Update="layout.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="LICENSE">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
+    </None>
+    <None Update="manifest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="README.md">
       <Pack>True</Pack>

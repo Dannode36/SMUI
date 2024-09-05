@@ -2,6 +2,7 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SMUI.Types;
 using StardewModdingAPI;
 using StardewValley;
 using static StardewValley.LocationRequest;
@@ -23,7 +24,9 @@ namespace SMUI.Elements
             get
             {
                 if (Parent != null)
+                {
                     return Parent.Position + LocalPosition;
+                }
                 return LocalPosition;
             }
         }
@@ -33,9 +36,8 @@ namespace SMUI.Elements
 
         public abstract int Width { get; }
         public abstract int Height { get; }
-        public Rectangle Bounds => new((int)Position.X, (int)Position.Y, Width, Height);
-
-
+        public Margin Margin { get; set; }
+        public Rectangle Bounds => new((int)Position.X - Margin.Left, (int)Position.Y - Margin.Top, Width + Margin.Left + Margin.Right, Height + Margin.Top + Margin.Bottom);
 
         public bool Hover { get; private set; }
         public virtual string HoveredSound { get; set; } = string.Empty;
@@ -46,10 +48,8 @@ namespace SMUI.Elements
         public bool Clicked => Hover && ClickGestured;
         public virtual string ClickedSound { get; set; } = string.Empty;
 
-        //public abstract float DrawLayer { get; set; }
-
         /// <summary>Whether to disable the element so it's invisible and can't be interacted with.</summary>
-        public Func<bool>? ForceHide;
+        public Func<bool>? HideCondition;
 
         public bool Enabled { get; set; } = true;
 
@@ -135,11 +135,11 @@ namespace SMUI.Elements
             return Parent.GetRoot();
         }
 
-        /// <summary>Get whether the element is hidden based on <see cref="ForceHide"/> or its position relative to the screen.</summary>
+        /// <summary>Get whether the element is hidden based on <see cref="HideCondition"/> or its position relative to the screen.</summary>
         /// <param name="isOffScreen">Whether the element is currently off-screen.</param>
         public bool IsHidden(bool isOffScreen = false)
         {
-            return isOffScreen || ForceHide?.Invoke() == true || !Enabled;
+            return isOffScreen || HideCondition?.Invoke() == true || !Enabled;
         }
     }
 }

@@ -13,8 +13,10 @@ namespace SMUI.Layout
 {
     public static class LayoutHelper
     {
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public static IModHelper helper;
         public static IMonitor monitor;
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public static List<Layout> Layouts = new();
         static private Dictionary<string, string> layoutNameToPath = new();
