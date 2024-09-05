@@ -6,16 +6,8 @@ using SMUI.Elements;
 using SMUI.Elements.Pickers;
 using StardewModdingAPI;
 using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
-using static StardewValley.Objects.BedFurniture;
 
 namespace SMUI.Layout
 {
@@ -41,7 +33,10 @@ namespace SMUI.Layout
         public static Layout LoadLayout(string name)
         {
             var stream = new StreamReader(File.OpenRead(helper.DirectoryPath + "\\" + name));
-            
+            return LoadLayout(stream);
+        }
+        public static Layout LoadLayout(StreamReader stream)
+        {
             XDocument xmlDoc = XDocument.Load(stream, LoadOptions.SetLineInfo);
             Layout layout = new();
 

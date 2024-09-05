@@ -35,6 +35,8 @@ namespace SMUI.Elements
         public abstract int Height { get; }
         public Rectangle Bounds => new((int)Position.X, (int)Position.Y, Width, Height);
 
+
+
         public bool Hover { get; private set; }
         public virtual string HoveredSound { get; set; } = string.Empty;
         public virtual string Tooltip { get; set; } = string.Empty;
