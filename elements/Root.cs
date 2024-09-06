@@ -2,7 +2,7 @@ using StardewValley;
 
 namespace SMUI.Elements
 {
-    public class RootElement : Container
+    public class Root : Container
     {
         /*********
         ** Accessors
@@ -16,7 +16,7 @@ namespace SMUI.Elements
         /*********
         ** Public methods
         *********/
-        public RootElement()
+        public Root()
         {
             ModEntry.AddToUpdateList(this);
         }
@@ -36,7 +36,7 @@ namespace SMUI.Elements
         }
 
         /// <inheritdoc />
-        internal override RootElement GetRootImpl()
+        internal override Root GetRootImpl()
         {
             return this;
         }

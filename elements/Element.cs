@@ -123,12 +123,12 @@ namespace SMUI.Elements
 
         public abstract void Draw(SpriteBatch b);
 
-        public RootElement GetRoot()
+        public Root GetRoot()
         {
             return GetRootImpl();
         }
 
-        internal virtual RootElement GetRootImpl()
+        internal virtual Root GetRootImpl()
         {
             if (Parent == null)
                 throw new Exception("Element must have a parent.");

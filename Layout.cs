@@ -8,6 +8,8 @@ using StardewModdingAPI;
 using StardewValley;
 using System.Xml;
 using System.Xml.Linq;
+using StardewModdingAPI.Utilities;
+using System;
 
 namespace SMUI.Layout
 {
@@ -23,6 +25,9 @@ namespace SMUI.Layout
 
         public static Dictionary<string, object> EventRegistry = new();
 
+        //Collection of user defined tags and parsing logic for custom elements
+        private static readonly Dictionary<string, Func<XElement, Element>> UserTags = new();
+
         public static bool AddEventHandler(string name, Action<Element> handler)
         {
             return EventRegistry.TryAdd(name, handler);
@@ -30,6 +35,19 @@ namespace SMUI.Layout
         public static void RemoveEventHandler(string name)
         {
             EventRegistry.Remove(name);
+        }
+
+        public static bool AddXMLTagParser(string tag, Func<XElement, Element> func)
+        {
+            return UserTags.TryAdd(tag, func);
+        }
+        public static bool RemoveXMLTagParser(string tag)
+        {
+            return UserTags.Remove(tag);
+        }
+        public static bool TryGetXMLTagParser(string tag, out Func<XElement, Element> func)
+        {
+            return UserTags.TryGetValue(tag, out func);
         }
 
         public static Layout LoadLayout(string name)
@@ -67,7 +85,7 @@ namespace SMUI.Layout
     public class Layout
     {
         public string rootPath = string.Empty;
-        public RootElement root = new();
+        public Root root = new();
         public Dictionary<string, Element> uuidElements = new();
 
         private const string attr_OnClick = "onClick";
@@ -97,22 +115,32 @@ namespace SMUI.Layout
         private const string attr_Font = "font";
         private const string attr_Bold = "bold";
         private const string attr_Shadow = "shadow";
-        private const string attr_Value = "shadow";
-        private const string attr_Min = "shadow";
-        private const string attr_Max = "shadow";
-        private const string attr_Interval = "shadow";
+        private const string attr_Value = "value";
+        private const string attr_Min = "min";
+        private const string attr_Max = "max";
+        private const string attr_Interval = "interval";
+        private const string attr_Time = "time";
 
         public bool Parse(XDocument xml)
         {
-            if (xml.Root == null)
+            try
             {
+                if(xml.Root == null || xml.Root.Name != nameof(Root))
+                {
+                    throw new($"Expected \"{nameof(Root)}\" as the root node but found \"{xml?.Root?.Name ?? "null"}\"");
+                }
+
+                foreach (var element in xml.Root.Elements())
+                {
+                    root.AddChild(ParseGenericElement(element));
+                }
+                return true;
+            }
+            catch (Exception e)
+            {
+                LayoutHelper.monitor.Log(e.Message, LogLevel.Error);
                 return false;
             }
-            foreach (var element in xml.Root.Elements())
-            {
-                root.AddChild(ParseGenericElement(element));
-            }
-            return true;
         }
         private Element ParseGenericElement(XElement xElement)
         {
@@ -156,7 +184,6 @@ namespace SMUI.Layout
                     var btn_rectAttr = xElement.Attribute(attr_TextureRect) ?? throw new($"Button tag (line {LayoutHelper.GetElementLine(xElement)}) did not specify a rect");
                     Button button = new(GetBestTexture(btn_textureAttr.Value ?? "mouseCursors"), ParseVector4(btn_rectAttr.Value).ToRect());
 
-                    //OPTIONALS
                     TryFloatFromAttribute(xElement.Attribute(attr_Scale), ref button.Scale);
                     TryFloatFromAttribute(xElement.Attribute(attr_HoverScale), ref button.HoverScale);
                     TryFloatFromAttribute(xElement.Attribute(attr_ScaleSpeed), ref button.ScaleSpeed);
@@ -299,11 +326,29 @@ namespace SMUI.Layout
                     TryBindEventHandler(xElement, attr_OnChange, ref textbox.OnChange);
                     return textbox;
                 case nameof(DateTimePicker):
-                    return new DateTimePicker();
+                    DateTimePicker dateTimePicker = new();
+                    if (string.IsNullOrWhiteSpace(xElement.Value))
+                    {
+                        var ghostIntervalAttr = xElement.Attribute(attr_Interval);
+                        if(ghostIntervalAttr != null)
+                        {
+                            dateTimePicker.GhostInterval = int.Parse(ghostIntervalAttr.Value);
+                        }
+
+                        TryIntFromAttribute(xElement.Attribute(attr_Time), ref dateTimePicker.Time);
+                    }
+                    return dateTimePicker;
                 case nameof(DateTimePickerPopup):
                     return new DateTimePickerPopup();
                 default:
-                    throw new($"Invalid element tag (line {LayoutHelper.GetElementLine(xElement)})");
+                    if (LayoutHelper.TryGetXMLTagParser(xElement.Name.ToString(), out var func))
+                    {
+                        return func(xElement);
+                    }
+                    else
+                    {
+                        throw new($"Invalid element tag (line {LayoutHelper.GetElementLine(xElement)})");
+                    }
             }
         }
 

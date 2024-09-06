@@ -61,7 +61,8 @@ namespace SMUI.Elements
             if (IsHidden())
                 return;
 
-            b.Draw(Texture, Position, Checked ? CheckedTextureRect : UncheckedTextureRect, Color.White, 0, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 0);
+            b.Draw(Texture, Position, Checked ? CheckedTextureRect : UncheckedTextureRect,
+                Color.White, 0, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 0);
             Game1.activeClickableMenu?.drawMouse(b);
         }
     }

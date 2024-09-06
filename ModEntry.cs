@@ -12,9 +12,9 @@ namespace SMUI
 {
     internal sealed class ModEntry : Mod
     {
-        public static List<RootElement> updateList = new();
+        public static List<Root> updateList = new();
 
-        public static void AddToUpdateList(RootElement root)
+        public static void AddToUpdateList(Root root)
         {
             lock (updateList)
             {
@@ -24,7 +24,7 @@ namespace SMUI
                 }
             }
         }
-        public static bool RemoveFromUpdateList(RootElement root)
+        public static bool RemoveFromUpdateList(Root root)
         {
             lock (updateList)
             {

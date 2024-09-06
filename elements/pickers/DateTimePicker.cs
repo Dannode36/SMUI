@@ -13,7 +13,7 @@ namespace SMUI.Elements.Pickers
         public override int Height => 500;
 
         public SDate Date => new(Day, Season, Year);
-        public int Time { get; private set; } = 600;
+        public int Time = 600;
         private int Day = Game1.dayOfMonth;
         private string Season = Game1.currentSeason;
         private int Year = Game1.year;
@@ -46,8 +46,8 @@ namespace SMUI.Elements.Pickers
         private readonly Intbox intervalInput;
         private readonly Dropdown seasonDropdown;
 
-        public DateTimePicker() : this(Vector2.Zero, Game1.timeOfDay, SDate.Now(), 0) { }
-        public DateTimePicker(Vector2 buttonSize, int time, SDate date, int interval)
+        public DateTimePicker() : this(Game1.timeOfDay, SDate.Now(), 0) { }
+        public DateTimePicker(int time, SDate date, int interval = 0)
         {
             Time = time;
             Day = date.Day;
@@ -55,10 +55,6 @@ namespace SMUI.Elements.Pickers
             Year = date.Year;
             m_ghostInterval = interval;
 
-            if(buttonSize == Vector2.Zero)
-            {
-                buttonSize = new(ButtonWidth, ButtonHeight);
-            }
             Clickable = false;
 
             container = new()
