@@ -13,9 +13,9 @@ namespace SMUI.Elements.Pickers
 
         public SDate Date => new(Day, Season, Year);
         public int Time = 600;
-        private int Day = Game1.dayOfMonth;
-        private string Season = Game1.currentSeason;
-        private int Year = Game1.year;
+        public int Day = Game1.dayOfMonth;
+        public string Season = Game1.currentSeason;
+        public int Year = Game1.year;
 
         private int m_ghostInterval = 0;
         public int GhostInterval

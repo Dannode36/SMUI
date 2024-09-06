@@ -21,6 +21,7 @@ namespace SMUI.Layout
         public static List<Layout> Layouts = new();
         static private Dictionary<string, string> layoutNameToPath = new();
 
+        //Collection of user defined event handlers that can be referenced in layouts
         public static Dictionary<string, object> EventRegistry = new();
 
         //Collection of user defined tags and parsing logic for custom elements
@@ -30,9 +31,15 @@ namespace SMUI.Layout
         {
             return EventRegistry.TryAdd(name, handler);
         }
-        public static void RemoveEventHandler(string name)
+        public static bool RemoveEventHandler(string name)
         {
-            EventRegistry.Remove(name);
+            return EventRegistry.Remove(name);
+        }
+        public static bool TryGetEventHandler(string name, out Action<Element>? handler)
+        {
+            bool tryBool = EventRegistry.TryGetValue(name, out var uncastHandler);
+            handler = uncastHandler as Action<Element>;
+            return tryBool && handler != null;
         }
 
         public static bool AddXMLTagParser(string tag, Func<XElement, Element> func)
@@ -43,7 +50,7 @@ namespace SMUI.Layout
         {
             return UserTags.Remove(tag);
         }
-        public static bool TryGetXMLTagParser(string tag, out Func<XElement, Element> func)
+        public static bool TryGetXMLTagParser(string tag, out Func<XElement, Element>? func)
         {
             return UserTags.TryGetValue(tag, out func);
         }
@@ -118,6 +125,9 @@ namespace SMUI.Layout
         private const string attr_Max = "max";
         private const string attr_Interval = "interval";
         private const string attr_Time = "time";
+        private const string attr_Day = "day";
+        private const string attr_Season = "season";
+        private const string attr_Year = "year";
 
         public bool Parse(XDocument xml)
         {
@@ -246,9 +256,9 @@ namespace SMUI.Layout
                     }
                     return intbox;
                 case nameof(ItemSlot):
-                    return new ItemSlot(); //Unsupported
+                    throw new($"{nameof(ItemSlot)} is not yet supported (line {LayoutHelper.GetElementLine(xElement)})"); //Unsupported
                 case nameof(ItemWithBorder):
-                    return new ItemWithBorder(); //Unsupported
+                    throw new($"{nameof(ItemWithBorder)} is not yet supported (line {LayoutHelper.GetElementLine(xElement)})"); //Unsupported
                 case nameof(Label):
                     Label label = new()
                     {
@@ -332,12 +342,35 @@ namespace SMUI.Layout
                         {
                             dateTimePicker.GhostInterval = int.Parse(ghostIntervalAttr.Value);
                         }
-
                         TryIntFromAttribute(xElement.Attribute(attr_Time), ref dateTimePicker.Time);
+                        TryIntFromAttribute(xElement.Attribute(attr_Day), ref dateTimePicker.Day);
+                        dateTimePicker.Season = xElement.Attribute(attr_Season)?.Value ?? dateTimePicker.Season;
+                        TryIntFromAttribute(xElement.Attribute(attr_Year), ref dateTimePicker.Year);
+                    }
+                    else
+                    {
+                        throw new("Date time string parsing is not yet supported");
                     }
                     return dateTimePicker;
                 case nameof(DateTimePickerPopup):
-                    return new DateTimePickerPopup();
+                    DateTimePickerPopup dateTimePickerPopup = new();
+                    if (string.IsNullOrWhiteSpace(xElement.Value))
+                    {
+                        var ghostIntervalAttr = xElement.Attribute(attr_Interval);
+                        if (ghostIntervalAttr != null)
+                        {
+                            dateTimePickerPopup.GhostInterval = int.Parse(ghostIntervalAttr.Value);
+                        }
+                        TryIntFromAttribute(xElement.Attribute(attr_Time), ref dateTimePickerPopup.Time);
+                        TryIntFromAttribute(xElement.Attribute(attr_Day), ref dateTimePickerPopup.Day);
+                        dateTimePickerPopup.Season = xElement.Attribute(attr_Season)?.Value ?? dateTimePickerPopup.Season;
+                        TryIntFromAttribute(xElement.Attribute(attr_Year), ref dateTimePickerPopup.Year);
+                    }
+                    else
+                    {
+                        throw new("Date time string parsing is not yet supported");
+                    }
+                    return dateTimePickerPopup;
                 default:
                     if (LayoutHelper.TryGetXMLTagParser(xElement.Name.ToString(), out var parseFunc))
                     {
@@ -350,20 +383,6 @@ namespace SMUI.Layout
             }
         }
 
-        private static Option ParseOption(XElement xElement)
-        {
-            var valueAttr = xElement.Attribute(attr_Value);
-            if (valueAttr != null)
-            {
-                if (string.IsNullOrWhiteSpace(xElement.Value))
-                {
-                    return new(valueAttr.Value);
-                }
-                return new Option(xElement.Value, valueAttr.Value);
-            }
-
-            return new Option();
-        }
         private Texture2D? GetBestTexture(string name)
         {
             var game1Type = typeof(Game1);
@@ -423,6 +442,20 @@ namespace SMUI.Layout
             return null;
         }
 
+        private static Option ParseOption(XElement xElement)
+        {
+            var valueAttr = xElement.Attribute(attr_Value);
+            if (valueAttr != null)
+            {
+                if (string.IsNullOrWhiteSpace(xElement.Value))
+                {
+                    return new(valueAttr.Value);
+                }
+                return new Option(xElement.Value, valueAttr.Value);
+            }
+
+            return new Option();
+        }
         private static Vector2 ParseVector2(string definition)
         {
             float[] values = Array.ConvertAll(definition.Split(','), s => float.Parse(s));
