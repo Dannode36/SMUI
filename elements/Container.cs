@@ -1,11 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using StardewValley;
-using StardewValley.Characters;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace SMUI.Elements
 {

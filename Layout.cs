@@ -8,8 +8,6 @@ using StardewModdingAPI;
 using StardewValley;
 using System.Xml;
 using System.Xml.Linq;
-using StardewModdingAPI.Utilities;
-using System;
 
 namespace SMUI.Layout
 {
@@ -341,9 +339,9 @@ namespace SMUI.Layout
                 case nameof(DateTimePickerPopup):
                     return new DateTimePickerPopup();
                 default:
-                    if (LayoutHelper.TryGetXMLTagParser(xElement.Name.ToString(), out var func))
+                    if (LayoutHelper.TryGetXMLTagParser(xElement.Name.ToString(), out var parseFunc))
                     {
-                        return func(xElement);
+                        return parseFunc(xElement);
                     }
                     else
                     {

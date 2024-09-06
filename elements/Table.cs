@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Xml.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
-using StardewValley.BellsAndWhistles;
-using StardewValley.Characters;
 using StardewValley.Menus;
 
 namespace SMUI.Elements

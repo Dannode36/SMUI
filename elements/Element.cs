@@ -1,11 +1,9 @@
-using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SMUI.Types;
 using StardewModdingAPI;
 using StardewValley;
-using static StardewValley.LocationRequest;
 
 namespace SMUI.Elements
 {
