@@ -1,8 +1,8 @@
 ﻿<Root>
-	<Button tex="Cursors" texRect="432,439,9,9" pos="100,100" onClick="TesastLog" clickSound="select"></Button>
-	<Label shadow="false" pos="200,200">i love hayley 3</Label>
-	<StaticContainer pos="500,500" size="500,250" outlineColor="255,255,255,255">
-		<Label uuid="heart" enabled="false" shadow="false" pos="50,50">i love hayley 3</Label>
-		<Button tex="Cursors" texRect="432,439,9,9" pos="50,50" onClick="showText" boxDraw="true" size="500,50" clickSound="select"></Button>
-	</StaticContainer>
+    <Button tex="Cursors" texRect="432,439,9,9" pos="100,100" onClick="TesastLog" clickSound="select"></Button>
+    <Label shadow="false" pos="200,200">i love hayley 3</Label>
+    <StaticContainer pos="500,500" size="500,250" outlineColor="255,255,255,255">
+        <Label uuid="heart" enabled="false" shadow="false" pos="50,50">i love hayley 3</Label>
+        <Button tex="Cursors" texRect="432,439,9,9" pos="50,50" onClick="showText" boxDraw="true" size="500,50" clickSound="select"></Button>
+    </StaticContainer>
 </Root>

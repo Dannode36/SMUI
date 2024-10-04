@@ -182,7 +182,7 @@ namespace SMUI.Layout
                 case nameof(Button):
                     var btn_textureAttr = xElement.Attribute(attr_Texture);
                     var btn_rectAttr = xElement.Attribute(attr_TextureRect) ?? throw new($"Button tag (line {LayoutHelper.GetElementLine(xElement)}) did not specify a rect");
-                    Button button = new(GetBestTexture(btn_textureAttr.Value ?? "mouseCursors"), ParseVector4(btn_rectAttr.Value).ToRect());
+                    Button button = new(TryGetTexture(btn_textureAttr.Value ?? "mouseCursors"), ParseVector4(btn_rectAttr.Value).ToRect());
 
                     TryFloatFromAttribute(xElement.Attribute(attr_Scale), ref button.Scale);
                     TryFloatFromAttribute(xElement.Attribute(attr_HoverScale), ref button.HoverScale);
@@ -198,7 +198,7 @@ namespace SMUI.Layout
                     var cbx_textureAttr = xElement.Attribute(attr_Texture);
                     if (cbx_textureAttr != null)
                     {
-                        checkbox.Texture = GetBestTexture(cbx_textureAttr.Value);
+                        checkbox.Texture = TryGetTexture(cbx_textureAttr.Value);
                     }
                     TryRectFromAttribute(xElement.Attribute(attr_CheckedTextureRect), ref checkbox.CheckedTextureRect);
                     TryRectFromAttribute(xElement.Attribute(attr_UncheckedTextureRect), ref checkbox.UncheckedTextureRect);
@@ -234,7 +234,7 @@ namespace SMUI.Layout
                     var image_textureAttr = xElement.Attribute(attr_Texture);
                     if (image_textureAttr != null)
                     {
-                        image.Texture = GetBestTexture(image_textureAttr.Value);
+                        image.Texture = TryGetTexture(image_textureAttr.Value);
                     }
                     TryRectFromAttribute(xElement.Attribute(attr_TextureRect), ref image.TextureArea);
                     TryFloatFromAttribute(xElement.Attribute(attr_Scale), ref image.Scale);
@@ -255,7 +255,7 @@ namespace SMUI.Layout
                     Label label = new()
                     {
                         String = xElement.Value,
-                        Font = GetBestFont(xElement.Attribute(attr_Font)?.Value ?? "SmallFont")
+                        Font = TryGetFont(xElement.Attribute(attr_Font)?.Value ?? "SmallFont")
                     };
 
                     TryBoolFromAttribute(xElement.Attribute(attr_Bold), ref label.Bold);
@@ -359,14 +359,14 @@ namespace SMUI.Layout
             {
                 if (string.IsNullOrWhiteSpace(xElement.Value))
                 {
-                    return new(valueAttr.Value);
+                    return new Option(valueAttr.Value);
                 }
                 return new Option(xElement.Value, valueAttr.Value);
             }
 
             return new Option();
         }
-        private Texture2D? GetBestTexture(string name)
+        private Texture2D? TryGetTexture(string name)
         {
             var game1Type = typeof(Game1);
             var game1Prop = game1Type.GetMember(name);
@@ -395,7 +395,7 @@ namespace SMUI.Layout
             LayoutHelper.monitor.Log($"No texture with the name \"{name}\" could be found", LogLevel.Error);
             return null;
         }
-        private SpriteFont? GetBestFont(string name)
+        private SpriteFont? TryGetFont(string name)
         {
             var game1Type = typeof(Game1);
             var game1Prop = game1Type.GetMember(name);
